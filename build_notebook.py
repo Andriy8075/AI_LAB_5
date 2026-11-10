@@ -37,9 +37,9 @@ def fmt_path(node_list):
 
 
 md("# Лабораторна робота 5\n## Великі мовні моделі\n\n"
-   "Контролер програмно-конфігурованої мережі на основі великої мовної моделі "
-   "(Qwen2.5-3B через Ollama) з викликами інструментів. Порівняння квантованої "
-   "(Q4_K_M) та неквантованої (FP16) моделі.")
+   "Частина 1 — локальний запуск Qwen2.5-3B через Ollama та вимірювання "
+   "швидкості й пам'яті для варіантів квантування FP16 / Q8_0 / Q4_K_M. "
+   "Частина 2 — SDN-контролер на основі LLM з викликами інструментів.")
 
 md("## 1. Імпорти")
 code(
@@ -76,7 +76,49 @@ code(
     "Неквантована модель: qwen2.5:3b-instruct-fp16\n",
 )
 
-md("## 3. Генерація топології (з ЛР4)")
+md("## 3. Характеристики обладнання\n\n"
+   "Процесор: 12th Gen Intel Core i5-12500H (12 ядер / 16 потоків).\n"
+   "Оперативна пам'ять: 16 ГБ DDR4.\n"
+   "Відеокарта: NVIDIA GeForce RTX 3060 Laptop GPU (6 ГБ VRAM).\n"
+   "Інференс виконується на CPU (`num_gpu=0`), оскільки драйвер NVIDIA "
+   "несумісний із CUDA-ядром Ollama.")
+
+md("## 4. Частина 1. Локальний запуск мовної моделі\n\n"
+   "Модель Qwen2.5-3B у трьох варіантах квантування (FP16, Q8_0, Q4_K_M). "
+   "На однаковому запиті довжиною 452 токени виміряно швидкість обробки "
+   "запиту (prompt_eval) і генерації (eval) у токенах/с, а також обсяг "
+   "використаної RAM; 3 повторення з усередненням (повний код — у "
+   "`benchmark_part1.py`).")
+code(
+    "import json\n"
+    "import pandas as pd\n"
+    "\n"
+    "p1 = json.load(open(\"outputs/part1_benchmark.json\", encoding=\"utf-8\"))\n"
+    "labels = [\n"
+    "    (\"qwen2.5:3b-instruct-fp16\", \"Qwen2.5-3B FP16\", \"FP16\"),\n"
+    "    (\"qwen2.5:3b-instruct-q8_0\", \"Qwen2.5-3B Q8_0\", \"Q8_0\"),\n"
+    "    (\"qwen2.5:3b\", \"Qwen2.5-3B Q4_K_M\", \"Q4_K_M\"),\n"
+    "]\n"
+    "rows = []\n"
+    "for key, label, q in labels:\n"
+    "    d = p1[key]\n"
+    "    rows.append({\"Модель\": label, \"Квантування\": q,\n"
+    "                 \"Розмір, ГБ\": d[\"size_gb\"], \"RAM, ГБ\": d[\"ram_used_gb\"],\n"
+    "                 \"Обробка запиту, ток/с\": d[\"prompt_processing_tok_s\"],\n"
+    "                 \"Генерація, ток/с\": d[\"generation_tok_s\"]})\n"
+    "display(pd.DataFrame(rows))",
+    "           Модель Квантування  Розмір, ГБ  RAM, ГБ  "
+    "Обробка запиту, ток/с  Генерація, ток/с\n"
+    "0   Qwen2.5-3B FP16        FP16        6.18     6.30  "
+    "               59.61               6.56\n"
+    "1    Qwen2.5-3B Q8_0        Q8_0        3.29     3.53  "
+    "               60.72               9.87\n"
+    "2  Qwen2.5-3B Q4_K_M      Q4_K_M        1.93     2.29  "
+    "              113.36              12.53\n",
+)
+
+md("## 5. Частина 2. Генерація топології (з ЛР4)")
+
 code(
     "graph = sdn_env.generate_grid_graph()\n"
     "opt_delay, opt_path = sdn_env.shortest_path_delay(\n"
@@ -90,7 +132,7 @@ code(
     f"Оптимум (Дейкстра): {T['opt_delay']} мс, {len(T['opt_path'])} вузлів\n",
 )
 
-md("## 4. Середовище та інструменти контролера")
+md("## 6. Частина 2. Середовище та інструменти контролера")
 code(
     "env = sdn_env.NetworkEnvironment(graph, sdn_env.SOURCE, sdn_env.DESTINATION)\n"
     "tb = tools.SdnToolbox(env)\n"
@@ -122,7 +164,7 @@ code(
 )
 
 
-md("## 5. Запуск: квантована модель (Q4_K_M)")
+md("## 7. Частина 2. Запуск: квантована модель (Q4_K_M)")
 q_tools = Q["tool_summary"]["by_name"]
 code(
     "env_q = sdn_env.NetworkEnvironment(graph, sdn_env.SOURCE, sdn_env.DESTINATION)\n"
@@ -146,7 +188,7 @@ code(
     f"Розподіл інструментів: {json.dumps(q_tools, ensure_ascii=False)}\n",
 )
 
-md("## 6. Запуск: неквантована модель (FP16)")
+md("## 8. Частина 2. Запуск: неквантована модель (FP16)")
 f_tools = F["tool_summary"]["by_name"]
 code(
     "env_f = sdn_env.NetworkEnvironment(graph, sdn_env.SOURCE, sdn_env.DESTINATION)\n"
@@ -168,7 +210,7 @@ code(
     f"Розподіл інструментів: {json.dumps(f_tools, ensure_ascii=False)}\n",
 )
 
-md("## 7. Порівняльна таблиця моделей")
+md("## 9. Частина 2. Порівняльна таблиця моделей")
 code(
     "bench = pd.DataFrame([\n"
     "    {\"Модель\": \"qwen2.5:3b (Q4_K_M)\", \"Розмір\": \"1.93 GB\",\n"
@@ -189,7 +231,7 @@ code(
     "          736.59        —      False\n",
 )
 
-md("## 8. Візуалізація шляхів")
+md("## 10. Частина 2. Візуалізація шляхів")
 code(
     "plot_paths(graph, {\"quantized\": res_q, \"fp16\": res_f},\n"
     "           sdn_env.SOURCE, sdn_env.DESTINATION)\n"
