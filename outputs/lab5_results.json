@@ -1,0 +1,637 @@
+{
+  "topology": {
+    "num_nodes": 16,
+    "num_edges": 21,
+    "source": "10.0.0.0",
+    "destination": "10.0.3.3",
+    "opt_delay": 28,
+    "opt_path": [
+      "10.0.0.0",
+      "10.0.1.0",
+      "10.0.1.1",
+      "10.0.2.1",
+      "10.0.2.2",
+      "10.0.3.2",
+      "10.0.3.3"
+    ]
+  },
+  "quantized": {
+    "model": "qwen2.5:3b",
+    "finished": true,
+    "steps": 24,
+    "tool_calls": 18,
+    "llm_time_s": 180.251611,
+    "eval_tokens": 1092,
+    "prompt_tokens": 63313,
+    "log": [
+      {
+        "step": 1,
+        "tool": "get_flow_state",
+        "arguments": {},
+        "status": "ok",
+        "result": "{\"head\": \"10.0.0.0\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 28, \"path\": [\"10.0.0.0\"], \"installed_rules\": 0, \"revoked_rules\": 0, \"at_destination\": false}",
+        "llm_time_s": 13.1037809
+      },
+      {
+        "step": 2,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.0.0"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.0.0\", \"cost_to_destination\": 28, \"links\": {\"E\": {\"neighbor\": \"10.0.0.1\", \"delay_ms\": 3, \"cost_to_destination\": 31}, \"S\": {\"neighbor\": \"10.0.1.0\", \"delay_ms\": 5, \"cost_to_destination\": 23}}}",
+        "llm_time_s": 11.435920699999999
+      },
+      {
+        "step": 3,
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "S"
+        },
+        "status": "ok",
+        "result": "{\"head\": \"10.0.1.0\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 23, \"path\": [\"10.0.0.0\", \"10.0.1.0\"], \"installed_rules\": 1, \"revoked_rules\": 0, \"at_destination\": false}",
+        "llm_time_s": 13.741274299999997
+      },
+      {
+        "step": 4,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.1.0"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.1.0\", \"cost_to_destination\": 23, \"links\": {\"N\": {\"neighbor\": \"10.0.0.0\", \"delay_ms\": 5, \"cost_to_destination\": 28}, \"E\": {\"neighbor\": \"10.0.1.1\", \"delay_ms\": 7, \"cost_to_destination\": 16}}}",
+        "llm_time_s": 9.718887799999997
+      },
+      {
+        "step": 5,
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "E"
+        },
+        "status": "ok",
+        "result": "{\"head\": \"10.0.1.1\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 16, \"path\": [\"10.0.0.0\", \"10.0.1.0\", \"10.0.1.1\"], \"installed_rules\": 2, \"revoked_rules\": 0, \"at_destination\": false}",
+        "llm_time_s": 2.9666016999999982
+      },
+      {
+        "step": 6,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.1.1"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.1.1\", \"cost_to_destination\": 16, \"links\": {\"E\": {\"neighbor\": \"10.0.1.2\", \"delay_ms\": 6, \"cost_to_destination\": 22}, \"S\": {\"neighbor\": \"10.0.2.1\", \"delay_ms\": 2, \"cost_to_destination\": 14}, \"W\": {\"neighbor\": \"10.0.1.0\", \"delay_ms\": 7, \"cost_to_destination\": 23}}}",
+        "llm_time_s": 3.3397083999999992
+      },
+      {
+        "step": 7,
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "S"
+        },
+        "status": "ok",
+        "result": "{\"head\": \"10.0.2.1\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 14, \"path\": [\"10.0.0.0\", \"10.0.1.0\", \"10.0.1.1\", \"10.0.2.1\"], \"installed_rules\": 3, \"revoked_rules\": 0, \"at_destination\": false}",
+        "llm_time_s": 3.1888833000000005
+      },
+      {
+        "step": 8,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.2.1"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.2.1\", \"cost_to_destination\": 14, \"links\": {\"N\": {\"neighbor\": \"10.0.1.1\", \"delay_ms\": 2, \"cost_to_destination\": 16}, \"E\": {\"neighbor\": \"10.0.2.2\", \"delay_ms\": 2, \"cost_to_destination\": 12}, \"S\": {\"neighbor\": \"10.0.3.1\", \"delay_ms\": 9, \"cost_to_destination\": 15}, \"W\": {\"neighbor\": \"10.0.2.0\", \"delay_ms\": 8, \"cost_to_destination\": 22}}}",
+        "llm_time_s": 3.902441500000002
+      },
+      {
+        "step": 9,
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "E"
+        },
+        "status": "ok",
+        "result": "{\"head\": \"10.0.2.2\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 12, \"path\": [\"10.0.0.0\", \"10.0.1.0\", \"10.0.1.1\", \"10.0.2.1\", \"10.0.2.2\"], \"installed_rules\": 4, \"revoked_rules\": 0, \"at_destination\": false}",
+        "llm_time_s": 3.516003000000005
+      },
+      {
+        "step": 10,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.2.2"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.2.2\", \"cost_to_destination\": 12, \"links\": {\"N\": {\"neighbor\": \"10.0.1.2\", \"delay_ms\": 10, \"cost_to_destination\": 22}, \"E\": {\"neighbor\": \"10.0.2.3\", \"delay_ms\": 7, \"cost_to_destination\": 19}, \"S\": {\"neighbor\": \"10.0.3.2\", \"delay_ms\": 2, \"cost_to_destination\": 10}, \"W\": {\"neighbor\": \"10.0.2.1\", \"delay_ms\": 2, \"cost_to_destination\": 14}}}",
+        "llm_time_s": 4.314028300000004
+      },
+      {
+        "step": 11,
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "S"
+        },
+        "status": "ok",
+        "result": "{\"head\": \"10.0.3.2\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 10, \"path\": [\"10.0.0.0\", \"10.0.1.0\", \"10.0.1.1\", \"10.0.2.1\", \"10.0.2.2\", \"10.0.3.2\"], \"installed_rules\": 5, \"revoked_rules\": 0, \"at_destination\": false}",
+        "llm_time_s": 3.9791397000000046
+      },
+      {
+        "step": 12,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.3.2"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.3.2\", \"cost_to_destination\": 10, \"links\": {\"N\": {\"neighbor\": \"10.0.2.2\", \"delay_ms\": 2, \"cost_to_destination\": 12}, \"E\": {\"neighbor\": \"10.0.3.3\", \"delay_ms\": 10, \"cost_to_destination\": 0}, \"W\": {\"neighbor\": \"10.0.3.1\", \"delay_ms\": 5, \"cost_to_destination\": 15}}}",
+        "llm_time_s": 5.162320500000007
+      },
+      {
+        "step": 14,
+        "tool": "get_flow_state",
+        "arguments": {},
+        "status": "ok",
+        "result": "{\"head\": \"10.0.3.2\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 10, \"path\": [\"10.0.0.0\", \"10.0.1.0\", \"10.0.1.1\", \"10.0.2.1\", \"10.0.2.2\", \"10.0.3.2\"], \"installed_rules\": 5, \"revoked_rules\": 0, \"at_destination\": false}",
+        "llm_time_s": 2.560717799999992
+      },
+      {
+        "step": 16,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.3.2"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.3.2\", \"cost_to_destination\": 10, \"links\": {\"N\": {\"neighbor\": \"10.0.2.2\", \"delay_ms\": 2, \"cost_to_destination\": 12}, \"E\": {\"neighbor\": \"10.0.3.3\", \"delay_ms\": 10, \"cost_to_destination\": 0}, \"W\": {\"neighbor\": \"10.0.3.1\", \"delay_ms\": 5, \"cost_to_destination\": 15}}}",
+        "llm_time_s": 3.81117110000001
+      },
+      {
+        "step": 18,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.3.2"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.3.2\", \"cost_to_destination\": 10, \"links\": {\"N\": {\"neighbor\": \"10.0.2.2\", \"delay_ms\": 2, \"cost_to_destination\": 12}, \"E\": {\"neighbor\": \"10.0.3.3\", \"delay_ms\": 10, \"cost_to_destination\": 0}, \"W\": {\"neighbor\": \"10.0.3.1\", \"delay_ms\": 5, \"cost_to_destination\": 15}}}",
+        "llm_time_s": 3.4508095000000054
+      },
+      {
+        "step": 20,
+        "tool": "get_flow_state",
+        "arguments": {},
+        "status": "ok",
+        "result": "{\"head\": \"10.0.3.2\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 10, \"path\": [\"10.0.0.0\", \"10.0.1.0\", \"10.0.1.1\", \"10.0.2.1\", \"10.0.2.2\", \"10.0.3.2\"], \"installed_rules\": 5, \"revoked_rules\": 0, \"at_destination\": false}",
+        "llm_time_s": 2.4880117000000013
+      },
+      {
+        "step": 22,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.3.2"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.3.2\", \"cost_to_destination\": 10, \"links\": {\"N\": {\"neighbor\": \"10.0.2.2\", \"delay_ms\": 2, \"cost_to_destination\": 12}, \"E\": {\"neighbor\": \"10.0.3.3\", \"delay_ms\": 10, \"cost_to_destination\": 0}, \"W\": {\"neighbor\": \"10.0.3.1\", \"delay_ms\": 5, \"cost_to_destination\": 15}}}",
+        "llm_time_s": 3.681207900000004
+      },
+      {
+        "step": 23,
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "E"
+        },
+        "status": "ok",
+        "result": "{\"head\": \"10.0.3.3\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 0, \"path\": [\"10.0.0.0\", \"10.0.1.0\", \"10.0.1.1\", \"10.0.2.1\", \"10.0.2.2\", \"10.0.3.2\", \"10.0.3.3\"], \"installed_rules\": 6, \"revoked_rules\": 0, \"at_destination\": true}",
+        "llm_time_s": 13.11601300000001
+      },
+      {
+        "step": 24,
+        "tool": "(жодного виклику)",
+        "arguments": {},
+        "status": "finish-implicit",
+        "result": "{\"head\": \"10.0.3.3\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 0, \"path\": [\"10.0.0.0\", \"10.0.1.0\", \"10.0.1.1\", \"10.0.2.1\", \"10.0.2.2\", \"10.0.3.2\", \"10.0.3.3\"], \"installed_rules\": 6, \"revoked_rules\": 0, \"at_destination\": true}",
+        "llm_time_s": 35.52536219999999
+      }
+    ],
+    "flow_state": {
+      "head": "10.0.3.3",
+      "source": "10.0.0.0",
+      "destination": "10.0.3.3",
+      "cost_to_destination": 0,
+      "path": [
+        "10.0.0.0",
+        "10.0.1.0",
+        "10.0.1.1",
+        "10.0.2.1",
+        "10.0.2.2",
+        "10.0.3.2",
+        "10.0.3.3"
+      ],
+      "installed_rules": 6,
+      "revoked_rules": 0,
+      "at_destination": true
+    },
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ],
+      [
+        3,
+        3
+      ]
+    ],
+    "delay": 28,
+    "nodes": 7,
+    "installed": 6,
+    "revoked": 0,
+    "tool_summary": {
+      "tool_calls": 18,
+      "by_name": {
+        "get_flow_state": 3,
+        "get_link_stats": 9,
+        "install_flow": 6
+      }
+    },
+    "wall_time_s": 180.275243,
+    "size": "1.93 GB"
+  },
+  "fp16": {
+    "model": "qwen2.5:3b-instruct-fp16",
+    "finished": false,
+    "steps": 30,
+    "tool_calls": 30,
+    "llm_time_s": 736.5850159000001,
+    "eval_tokens": 737,
+    "prompt_tokens": 89917,
+    "log": [
+      {
+        "step": 1,
+        "tool": "get_flow_state",
+        "arguments": {},
+        "status": "ok",
+        "result": "{\"head\": \"10.0.0.0\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 28, \"path\": [\"10.0.0.0\"], \"installed_rules\": 0, \"revoked_rules\": 0, \"at_destination\": false}",
+        "llm_time_s": 30.34303729999999
+      },
+      {
+        "step": 2,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.0.0"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.0.0\", \"cost_to_destination\": 28, \"links\": {\"E\": {\"neighbor\": \"10.0.0.1\", \"delay_ms\": 3, \"cost_to_destination\": 31}, \"S\": {\"neighbor\": \"10.0.1.0\", \"delay_ms\": 5, \"cost_to_destination\": 23}}}",
+        "llm_time_s": 6.214351800000003
+      },
+      {
+        "step": 3,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.0.1"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.0.1\", \"cost_to_destination\": 31, \"links\": {\"E\": {\"neighbor\": \"10.0.0.2\", \"delay_ms\": 4, \"cost_to_destination\": 28}, \"W\": {\"neighbor\": \"10.0.0.0\", \"delay_ms\": 3, \"cost_to_destination\": 28}}}",
+        "llm_time_s": 6.546681700000022
+      },
+      {
+        "step": 4,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.0.2"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.0.2\", \"cost_to_destination\": 28, \"links\": {\"E\": {\"neighbor\": \"10.0.0.3\", \"delay_ms\": 2, \"cost_to_destination\": 26}, \"S\": {\"neighbor\": \"10.0.1.2\", \"delay_ms\": 6, \"cost_to_destination\": 22}, \"W\": {\"neighbor\": \"10.0.0.1\", \"delay_ms\": 4, \"cost_to_destination\": 31}}}",
+        "llm_time_s": 6.266532699999999
+      },
+      {
+        "step": 5,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.0.3"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.0.3\", \"cost_to_destination\": 26, \"links\": {\"S\": {\"neighbor\": \"10.0.1.3\", \"delay_ms\": 2, \"cost_to_destination\": 24}, \"W\": {\"neighbor\": \"10.0.0.2\", \"delay_ms\": 2, \"cost_to_destination\": 28}}}",
+        "llm_time_s": 7.091360600000002
+      },
+      {
+        "step": 6,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.0.3"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.0.3\", \"cost_to_destination\": 26, \"links\": {\"S\": {\"neighbor\": \"10.0.1.3\", \"delay_ms\": 2, \"cost_to_destination\": 24}, \"W\": {\"neighbor\": \"10.0.0.2\", \"delay_ms\": 2, \"cost_to_destination\": 28}}}",
+        "llm_time_s": 6.390238000000011
+      },
+      {
+        "step": 7,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.1.3"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.1.3\", \"cost_to_destination\": 24, \"links\": {\"N\": {\"neighbor\": \"10.0.0.3\", \"delay_ms\": 2, \"cost_to_destination\": 26}, \"S\": {\"neighbor\": \"10.0.2.3\", \"delay_ms\": 5, \"cost_to_destination\": 19}, \"W\": {\"neighbor\": \"10.0.1.2\", \"delay_ms\": 6, \"cost_to_destination\": 22}}}",
+        "llm_time_s": 7.6453751999999895
+      },
+      {
+        "step": 8,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.1.2"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.1.2\", \"cost_to_destination\": 22, \"links\": {\"N\": {\"neighbor\": \"10.0.0.2\", \"delay_ms\": 6, \"cost_to_destination\": 28}, \"E\": {\"neighbor\": \"10.0.1.3\", \"delay_ms\": 6, \"cost_to_destination\": 24}, \"S\": {\"neighbor\": \"10.0.2.2\", \"delay_ms\": 10, \"cost_to_destination\": 12}, \"W\": {\"neighbor\": \"10.0.1.1\", \"delay_ms\": 6, \"cost_to_destination\": 16}}}",
+        "llm_time_s": 7.514945199999971
+      },
+      {
+        "step": 9,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.1.1"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.1.1\", \"cost_to_destination\": 16, \"links\": {\"E\": {\"neighbor\": \"10.0.1.2\", \"delay_ms\": 6, \"cost_to_destination\": 22}, \"S\": {\"neighbor\": \"10.0.2.1\", \"delay_ms\": 2, \"cost_to_destination\": 14}, \"W\": {\"neighbor\": \"10.0.1.0\", \"delay_ms\": 7, \"cost_to_destination\": 23}}}",
+        "llm_time_s": 8.213266300000043
+      },
+      {
+        "step": 10,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.2.1"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.2.1\", \"cost_to_destination\": 14, \"links\": {\"N\": {\"neighbor\": \"10.0.1.1\", \"delay_ms\": 2, \"cost_to_destination\": 16}, \"E\": {\"neighbor\": \"10.0.2.2\", \"delay_ms\": 2, \"cost_to_destination\": 12}, \"S\": {\"neighbor\": \"10.0.3.1\", \"delay_ms\": 9, \"cost_to_destination\": 15}, \"W\": {\"neighbor\": \"10.0.2.0\", \"delay_ms\": 8, \"cost_to_destination\": 22}}}",
+        "llm_time_s": 7.5354423
+      },
+      {
+        "step": 11,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.2.2"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.2.2\", \"cost_to_destination\": 12, \"links\": {\"N\": {\"neighbor\": \"10.0.1.2\", \"delay_ms\": 10, \"cost_to_destination\": 22}, \"E\": {\"neighbor\": \"10.0.2.3\", \"delay_ms\": 7, \"cost_to_destination\": 19}, \"S\": {\"neighbor\": \"10.0.3.2\", \"delay_ms\": 2, \"cost_to_destination\": 10}, \"W\": {\"neighbor\": \"10.0.2.1\", \"delay_ms\": 2, \"cost_to_destination\": 14}}}",
+        "llm_time_s": 8.25266810000005
+      },
+      {
+        "step": 12,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.2.3"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.2.3\", \"cost_to_destination\": 19, \"links\": {\"N\": {\"neighbor\": \"10.0.1.3\", \"delay_ms\": 5, \"cost_to_destination\": 24}, \"W\": {\"neighbor\": \"10.0.2.2\", \"delay_ms\": 7, \"cost_to_destination\": 12}}}",
+        "llm_time_s": 8.426067799999998
+      },
+      {
+        "step": 13,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.2.3"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.2.3\", \"cost_to_destination\": 19, \"links\": {\"N\": {\"neighbor\": \"10.0.1.3\", \"delay_ms\": 5, \"cost_to_destination\": 24}, \"W\": {\"neighbor\": \"10.0.2.2\", \"delay_ms\": 7, \"cost_to_destination\": 12}}}",
+        "llm_time_s": 6.805627399999992
+      },
+      {
+        "step": 14,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.1.3"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.1.3\", \"cost_to_destination\": 24, \"links\": {\"N\": {\"neighbor\": \"10.0.0.3\", \"delay_ms\": 2, \"cost_to_destination\": 26}, \"S\": {\"neighbor\": \"10.0.2.3\", \"delay_ms\": 5, \"cost_to_destination\": 19}, \"W\": {\"neighbor\": \"10.0.1.2\", \"delay_ms\": 6, \"cost_to_destination\": 22}}}",
+        "llm_time_s": 6.821340399999997
+      },
+      {
+        "step": 15,
+        "tool": "finish_flow",
+        "arguments": {},
+        "status": "error",
+        "result": "{\"error\": \"Не можна завершити: голова потоку ще не в отримувачі (поточний вузол 10.0.0.0).\"}",
+        "llm_time_s": 8.060326199999963
+      },
+      {
+        "step": 16,
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "S"
+        },
+        "status": "ok",
+        "result": "{\"head\": \"10.0.1.0\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 23, \"path\": [\"10.0.0.0\", \"10.0.1.0\"], \"installed_rules\": 1, \"revoked_rules\": 0, \"at_destination\": false}",
+        "llm_time_s": 5.342011000000014
+      },
+      {
+        "step": 17,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.1.0"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.1.0\", \"cost_to_destination\": 23, \"links\": {\"N\": {\"neighbor\": \"10.0.0.0\", \"delay_ms\": 5, \"cost_to_destination\": 28}, \"E\": {\"neighbor\": \"10.0.1.1\", \"delay_ms\": 7, \"cost_to_destination\": 16}}}",
+        "llm_time_s": 7.015783099999965
+      },
+      {
+        "step": 18,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.1.1"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.1.1\", \"cost_to_destination\": 16, \"links\": {\"E\": {\"neighbor\": \"10.0.1.2\", \"delay_ms\": 6, \"cost_to_destination\": 22}, \"S\": {\"neighbor\": \"10.0.2.1\", \"delay_ms\": 2, \"cost_to_destination\": 14}, \"W\": {\"neighbor\": \"10.0.1.0\", \"delay_ms\": 7, \"cost_to_destination\": 23}}}",
+        "llm_time_s": 7.082757700000002
+      },
+      {
+        "step": 19,
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "W"
+        },
+        "status": "error",
+        "result": "{\"error\": \"Немає каналу W на вузлі 10.0.1.0\"}",
+        "llm_time_s": 6.661406499999998
+      },
+      {
+        "step": 20,
+        "tool": "revoke_flow",
+        "arguments": {},
+        "status": "ok",
+        "result": "{\"head\": \"10.0.0.0\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 28, \"path\": [\"10.0.0.0\"], \"installed_rules\": 1, \"revoked_rules\": 1, \"at_destination\": false}",
+        "llm_time_s": 4.845046000000025
+      },
+      {
+        "step": 21,
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "E"
+        },
+        "status": "ok",
+        "result": "{\"head\": \"10.0.0.1\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 31, \"path\": [\"10.0.0.0\", \"10.0.0.1\"], \"installed_rules\": 2, \"revoked_rules\": 1, \"at_destination\": false}",
+        "llm_time_s": 7.354733899999985
+      },
+      {
+        "step": 22,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.0.1"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.0.1\", \"cost_to_destination\": 31, \"links\": {\"E\": {\"neighbor\": \"10.0.0.2\", \"delay_ms\": 4, \"cost_to_destination\": 28}, \"W\": {\"neighbor\": \"10.0.0.0\", \"delay_ms\": 3, \"cost_to_destination\": 28}}}",
+        "llm_time_s": 7.417154400000015
+      },
+      {
+        "step": 23,
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "E"
+        },
+        "status": "ok",
+        "result": "{\"head\": \"10.0.0.2\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 28, \"path\": [\"10.0.0.0\", \"10.0.0.1\", \"10.0.0.2\"], \"installed_rules\": 3, \"revoked_rules\": 1, \"at_destination\": false}",
+        "llm_time_s": 69.48451039999998
+      },
+      {
+        "step": 24,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.0.2"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.0.2\", \"cost_to_destination\": 28, \"links\": {\"E\": {\"neighbor\": \"10.0.0.3\", \"delay_ms\": 2, \"cost_to_destination\": 26}, \"S\": {\"neighbor\": \"10.0.1.2\", \"delay_ms\": 6, \"cost_to_destination\": 22}, \"W\": {\"neighbor\": \"10.0.0.1\", \"delay_ms\": 4, \"cost_to_destination\": 31}}}",
+        "llm_time_s": 71.3326007
+      },
+      {
+        "step": 25,
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "E"
+        },
+        "status": "ok",
+        "result": "{\"head\": \"10.0.0.3\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 26, \"path\": [\"10.0.0.0\", \"10.0.0.1\", \"10.0.0.2\", \"10.0.0.3\"], \"installed_rules\": 4, \"revoked_rules\": 1, \"at_destination\": false}",
+        "llm_time_s": 68.6915224
+      },
+      {
+        "step": 26,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.0.3"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.0.3\", \"cost_to_destination\": 26, \"links\": {\"S\": {\"neighbor\": \"10.0.1.3\", \"delay_ms\": 2, \"cost_to_destination\": 24}, \"W\": {\"neighbor\": \"10.0.0.2\", \"delay_ms\": 2, \"cost_to_destination\": 28}}}",
+        "llm_time_s": 69.59018900000001
+      },
+      {
+        "step": 27,
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "S"
+        },
+        "status": "ok",
+        "result": "{\"head\": \"10.0.1.3\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 24, \"path\": [\"10.0.0.0\", \"10.0.0.1\", \"10.0.0.2\", \"10.0.0.3\", \"10.0.1.3\"], \"installed_rules\": 5, \"revoked_rules\": 1, \"at_destination\": false}",
+        "llm_time_s": 70.17038720000005
+      },
+      {
+        "step": 28,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.1.3"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.1.3\", \"cost_to_destination\": 24, \"links\": {\"N\": {\"neighbor\": \"10.0.0.3\", \"delay_ms\": 2, \"cost_to_destination\": 26}, \"S\": {\"neighbor\": \"10.0.2.3\", \"delay_ms\": 5, \"cost_to_destination\": 19}, \"W\": {\"neighbor\": \"10.0.1.2\", \"delay_ms\": 6, \"cost_to_destination\": 22}}}",
+        "llm_time_s": 69.75563440000008
+      },
+      {
+        "step": 29,
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "N"
+        },
+        "status": "ok",
+        "result": "{\"head\": \"10.0.0.3\", \"source\": \"10.0.0.0\", \"destination\": \"10.0.3.3\", \"cost_to_destination\": 26, \"path\": [\"10.0.0.0\", \"10.0.0.1\", \"10.0.0.2\", \"10.0.0.3\", \"10.0.1.3\", \"10.0.0.3\"], \"installed_rules\": 6, \"revoked_rules\": 1, \"at_destination\": false}",
+        "llm_time_s": 68.56874049999999
+      },
+      {
+        "step": 30,
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.0.3"
+        },
+        "status": "ok",
+        "result": "{\"node\": \"10.0.0.3\", \"cost_to_destination\": 26, \"links\": {\"S\": {\"neighbor\": \"10.0.1.3\", \"delay_ms\": 2, \"cost_to_destination\": 24}, \"W\": {\"neighbor\": \"10.0.0.2\", \"delay_ms\": 2, \"cost_to_destination\": 28}}}",
+        "llm_time_s": 71.14527769999995
+      }
+    ],
+    "flow_state": {
+      "head": "10.0.0.3",
+      "source": "10.0.0.0",
+      "destination": "10.0.3.3",
+      "cost_to_destination": 26,
+      "path": [
+        "10.0.0.0",
+        "10.0.0.1",
+        "10.0.0.2",
+        "10.0.0.3",
+        "10.0.1.3",
+        "10.0.0.3"
+      ],
+      "installed_rules": 6,
+      "revoked_rules": 1,
+      "at_destination": false
+    },
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        0,
+        3
+      ]
+    ],
+    "delay": 13,
+    "nodes": 6,
+    "installed": 6,
+    "revoked": 1,
+    "tool_summary": {
+      "tool_calls": 30,
+      "by_name": {
+        "get_flow_state": 1,
+        "get_link_stats": 20,
+        "finish_flow": 1,
+        "install_flow": 7,
+        "revoke_flow": 1
+      }
+    },
+    "wall_time_s": 736.6124153,
+    "size": "6.18 GB"
+  }
+}
