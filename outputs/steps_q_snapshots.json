@@ -1,0 +1,826 @@
+[
+  {
+    "step": 1,
+    "head": "10.0.0.0",
+    "path": [
+      [
+        0,
+        0
+      ]
+    ],
+    "installed": 0,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "get_flow_state",
+        "arguments": {},
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 2,
+    "head": "10.0.0.0",
+    "path": [
+      [
+        0,
+        0
+      ]
+    ],
+    "installed": 0,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.0.0"
+        },
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 3,
+    "head": "10.0.1.0",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ]
+    ],
+    "installed": 1,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "S"
+        },
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 4,
+    "head": "10.0.1.0",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ]
+    ],
+    "installed": 1,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.1.0"
+        },
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 5,
+    "head": "10.0.1.1",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "installed": 2,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "E"
+        },
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 6,
+    "head": "10.0.1.1",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "installed": 2,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.1.1"
+        },
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 7,
+    "head": "10.0.2.1",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ]
+    ],
+    "installed": 3,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "S"
+        },
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 8,
+    "head": "10.0.2.1",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ]
+    ],
+    "installed": 3,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.2.1"
+        },
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 9,
+    "head": "10.0.2.2",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ]
+    ],
+    "installed": 4,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "E"
+        },
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 10,
+    "head": "10.0.2.2",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ]
+    ],
+    "installed": 4,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.2.2"
+        },
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 11,
+    "head": "10.0.3.2",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ]
+    ],
+    "installed": 5,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "S"
+        },
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 12,
+    "head": "10.0.3.2",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ]
+    ],
+    "installed": 5,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.3.2"
+        },
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 13,
+    "head": "10.0.3.2",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ]
+    ],
+    "installed": 5,
+    "revoked": 0,
+    "actions": []
+  },
+  {
+    "step": 14,
+    "head": "10.0.3.2",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ]
+    ],
+    "installed": 5,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "get_flow_state",
+        "arguments": {},
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 15,
+    "head": "10.0.3.2",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ]
+    ],
+    "installed": 5,
+    "revoked": 0,
+    "actions": []
+  },
+  {
+    "step": 16,
+    "head": "10.0.3.2",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ]
+    ],
+    "installed": 5,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.3.2"
+        },
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 17,
+    "head": "10.0.3.2",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ]
+    ],
+    "installed": 5,
+    "revoked": 0,
+    "actions": []
+  },
+  {
+    "step": 18,
+    "head": "10.0.3.2",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ]
+    ],
+    "installed": 5,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.3.2"
+        },
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 19,
+    "head": "10.0.3.2",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ]
+    ],
+    "installed": 5,
+    "revoked": 0,
+    "actions": []
+  },
+  {
+    "step": 20,
+    "head": "10.0.3.2",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ]
+    ],
+    "installed": 5,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "get_flow_state",
+        "arguments": {},
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 21,
+    "head": "10.0.3.2",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ]
+    ],
+    "installed": 5,
+    "revoked": 0,
+    "actions": []
+  },
+  {
+    "step": 22,
+    "head": "10.0.3.2",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ]
+    ],
+    "installed": 5,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "get_link_stats",
+        "arguments": {
+          "node": "10.0.3.2"
+        },
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 23,
+    "head": "10.0.3.3",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ],
+      [
+        3,
+        3
+      ]
+    ],
+    "installed": 6,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "install_flow",
+        "arguments": {
+          "direction": "E"
+        },
+        "status": "ok"
+      }
+    ]
+  },
+  {
+    "step": 24,
+    "head": "10.0.3.3",
+    "path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ],
+      [
+        3,
+        3
+      ]
+    ],
+    "installed": 6,
+    "revoked": 0,
+    "actions": [
+      {
+        "tool": "(жодного виклику)",
+        "arguments": {},
+        "status": "finish-implicit"
+      }
+    ]
+  }
+]

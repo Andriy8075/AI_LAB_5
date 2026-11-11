@@ -62,6 +62,7 @@ class LlmController:
         prompt_tokens = 0
         finished = False
         no_tool_streak = 0
+        snapshots = []
 
         for step in range(1, self.max_steps + 1):
             t0 = time.perf_counter()
@@ -114,6 +115,7 @@ class LlmController:
                 })
                 no_tool_streak = 0
 
+            step_actions = []
             for call in tool_calls:
                 fn = call.function
                 name = fn.name
@@ -137,8 +139,22 @@ class LlmController:
                     "status": status, "result": result_text,
                     "llm_time_s": elapsed,
                 })
+                step_actions.append({
+                    "tool": name, "arguments": dict(arguments), "status": status,
+                })
                 if name == "finish_flow" and status == "ok":
                     finished = True
+
+            # Знімок стану після цього кроку (для покрокової візуалізації)
+            state = self.toolbox.env.flow_state()
+            snapshots.append({
+                "step": step,
+                "head": state["head"],
+                "path": list(self.toolbox.env.path()),
+                "installed": self.toolbox.env.installed,
+                "revoked": self.toolbox.env.revoked,
+                "actions": step_actions,
+            })
 
             if finished:
                 break
@@ -184,6 +200,7 @@ class LlmController:
             "eval_tokens": eval_tokens,
             "prompt_tokens": prompt_tokens,
             "log": log,
+            "snapshots": snapshots,
             "flow_state": self.toolbox.env.flow_state(),
             "path": self.toolbox.env.path(),
             "delay": self.toolbox.env.path_delay(),

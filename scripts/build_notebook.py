@@ -23,6 +23,12 @@ _topo_delay, _topo_path = _sdn.shortest_path_delay(
     _topo_graph, _sdn.SOURCE, _sdn.DESTINATION)
 ASCII_TOPO = _ascii(_topo_graph, _topo_path, _sdn.SOURCE, _sdn.DESTINATION)
 
+# Покрокові ASCII-журнали (для комірок 7 і 8)
+STEPS_Q_ASCII = open(os.path.join(ROOT, "outputs", "steps_q_ascii.txt"),
+                     encoding="utf-8").read()
+STEPS_F_ASCII = open(os.path.join(ROOT, "outputs", "steps_f_ascii.txt"),
+                     encoding="utf-8").read()
+
 RESULTS = json.load(open(os.path.join(ROOT, "outputs", "lab5_results.json"),
                          encoding="utf-8"))
 Q = RESULTS["quantized"]
@@ -79,7 +85,8 @@ code(
     "import sdn_env\n"
     "import tools\n"
     "from llm_controller import LlmController\n"
-    "from visualization import draw_state, plot_paths, render_state_ascii\n"
+    "from visualization import (action_label, draw_state, plot_paths,\n"
+    "                          plot_step_sequence, render_state_ascii)\n"
     "\n"
     "plt.rcParams[\"font.family\"] = \"DejaVu Sans\"\n"
     "print(\"Імпорт виконано\")",
@@ -213,14 +220,31 @@ code(
     "print(\"Шлях:\", \" -> \".join(sdn_env.node_address(n) for n in res_q['path']))\n"
     "print(f\"Затримка: {res_q['delay']} мс, вузлів: {res_q['nodes']}; \"\n"
     "      f\"встановлено {res_q['installed']}, відкликано {res_q['revoked']}\")\n"
-    "print(\"Розподіл інструментів:\", res_q['tool_summary']['by_name'])",
-    f"Завершено: {Q['finished']}; LLM-викликів: {Q['steps']}; "
-    f"інструментів: {Q['tool_calls']}\n"
-    f"Час інференсу: {Q['llm_time_s']:.2f} с\n"
-    f"Шлях: {fmt_path(T['opt_path'])}\n"
-    f"Затримка: {Q['delay']} мс, вузлів: {Q['nodes']}; "
-    f"встановлено {Q['installed']}, відкликано {Q['revoked']}\n"
-    f"Розподіл інструментів: {json.dumps(q_tools, ensure_ascii=False)}\n",
+    "print(\"Розподіл інструментів:\", res_q['tool_summary']['by_name'])\n"
+    "\n"
+    "# Покроковий журнал: що робить агент і де голова потоку на кожному кроці\n"
+    "for s in res_q['snapshots']:\n"
+    "    acts = \", \".join(action_label(a) for a in s['actions']) or \"—\"\n"
+    "    head = sdn_env.parse_address(s['head'])\n"
+    "    print(f\"--- Крок {s['step']:>2}: {acts} | голова {s['head']} | \"\n"
+    "          f\"правил {s['installed']}, відкликано {s['revoked']} ---\")\n"
+    "    print(render_state_ascii(graph, s['path'], sdn_env.SOURCE, sdn_env.DESTINATION,\n"
+    "                            head=head))\n"
+    "\n"
+    "# Сітка графіків: по одному на кожен крок\n"
+    "plot_step_sequence(graph, res_q['snapshots'], sdn_env.SOURCE, sdn_env.DESTINATION,\n"
+    "                   title=f\"Покрокова маршрутизація — {QUANTIZED_MODEL}\")",
+    out_text=(
+        f"Завершено: {Q['finished']}; LLM-викликів: {Q['steps']}; "
+        f"інструментів: {Q['tool_calls']}\n"
+        f"Час інференсу: {Q['llm_time_s']:.2f} с\n"
+        f"Шлях: {fmt_path(T['opt_path'])}\n"
+        f"Затримка: {Q['delay']} мс, вузлів: {Q['nodes']}; "
+        f"встановлено {Q['installed']}, відкликано {Q['revoked']}\n"
+        f"Розподіл інструментів: {json.dumps(q_tools, ensure_ascii=False)}\n"
+        f"\n{STEPS_Q_ASCII}"
+    ),
+    image_path=os.path.join(ROOT, "figures", "steps_q.png"),
 )
 
 md("## 8. Частина 2. Запуск: неквантована модель (FP16)")
@@ -236,13 +260,30 @@ code(
     "print(f\"Час інференсу: {res_f['llm_time_s']:.2f} с\")\n"
     "print(\"Шлях:\", \" -> \".join(sdn_env.node_address(n) for n in res_f['path']))\n"
     "print(f\"Встановлено {res_f['installed']}, відкликано {res_f['revoked']}\")\n"
-    "print(\"Розподіл інструментів:\", res_f['tool_summary']['by_name'])",
-    f"Завершено: {F['finished']}; LLM-викликів: {F['steps']}; "
-    f"інструментів: {F['tool_calls']}\n"
-    f"Час інференсу: {F['llm_time_s']:.2f} с\n"
-    f"Шлях: {fmt_path(F['flow_state']['path'])}\n"
-    f"Встановлено {F['installed']}, відкликано {F['revoked']}\n"
-    f"Розподіл інструментів: {json.dumps(f_tools, ensure_ascii=False)}\n",
+    "print(\"Розподіл інструментів:\", res_f['tool_summary']['by_name'])\n"
+    "\n"
+    "# Покроковий журнал: що робить агент і де голова потоку на кожному кроці\n"
+    "for s in res_f['snapshots']:\n"
+    "    acts = \", \".join(action_label(a) for a in s['actions']) or \"—\"\n"
+    "    head = sdn_env.parse_address(s['head'])\n"
+    "    print(f\"--- Крок {s['step']:>2}: {acts} | голова {s['head']} | \"\n"
+    "          f\"правил {s['installed']}, відкликано {s['revoked']} ---\")\n"
+    "    print(render_state_ascii(graph, s['path'], sdn_env.SOURCE, sdn_env.DESTINATION,\n"
+    "                            head=head))\n"
+    "\n"
+    "# Сітка графіків: по одному на кожен крок\n"
+    "plot_step_sequence(graph, res_f['snapshots'], sdn_env.SOURCE, sdn_env.DESTINATION,\n"
+    "                   title=f\"Покрокова маршрутизація — {FP16_MODEL}\")",
+    out_text=(
+        f"Завершено: {F['finished']}; LLM-викликів: {F['steps']}; "
+        f"інструментів: {F['tool_calls']}\n"
+        f"Час інференсу: {F['llm_time_s']:.2f} с\n"
+        f"Шлях: {fmt_path(F['flow_state']['path'])}\n"
+        f"Встановлено {F['installed']}, відкликано {F['revoked']}\n"
+        f"Розподіл інструментів: {json.dumps(f_tools, ensure_ascii=False)}\n"
+        f"\n{STEPS_F_ASCII}"
+    ),
+    image_path=os.path.join(ROOT, "figures", "steps_f.png"),
 )
 
 md("## 9. Частина 2. Порівняльна таблиця моделей")
