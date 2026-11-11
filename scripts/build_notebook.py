@@ -1,6 +1,7 @@
 """Будує lab5.ipynb (блокнот лабораторної роботи 5) і заповнює його
 результатами з outputs/lab5_results.json."""
 
+import base64
 import json
 import os
 import sys
@@ -11,6 +12,17 @@ import nbformat as nbf
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(BASE)
+
+# Для ASCII-зображення топології та вбудовування PNG у комірку
+sys.path.insert(0, os.path.join(ROOT, "src"))
+import sdn_env as _sdn
+from visualization import render_state_ascii as _ascii
+
+_topo_graph = _sdn.generate_grid_graph()
+_topo_delay, _topo_path = _sdn.shortest_path_delay(
+    _topo_graph, _sdn.SOURCE, _sdn.DESTINATION)
+ASCII_TOPO = _ascii(_topo_graph, _topo_path, _sdn.SOURCE, _sdn.DESTINATION)
+
 RESULTS = json.load(open(os.path.join(ROOT, "outputs", "lab5_results.json"),
                          encoding="utf-8"))
 Q = RESULTS["quantized"]
@@ -25,10 +37,20 @@ def md(text):
     cells.append(nbf.v4.new_markdown_cell(text))
 
 
-def code(src, out_text=None):
+def code(src, out_text=None, image_path=None):
     c = nbf.v4.new_code_cell(src)
+    outputs = []
     if out_text is not None:
-        c.outputs = [nbf.v4.new_output("stream", name="stdout", text=out_text)]
+        outputs.append(nbf.v4.new_output("stream", name="stdout", text=out_text))
+    if image_path is not None and os.path.exists(image_path):
+        with open(image_path, "rb") as f:
+            data = base64.b64encode(f.read()).decode("ascii")
+        outputs.append(nbf.v4.new_output(
+            "display_data",
+            data={"image/png": data, "text/plain": ["<Figure size 900x800 with 1 Axes>"]},
+        ))
+    if outputs:
+        c.outputs = outputs
         c.execution_count = 1
     cells.append(c)
 
@@ -50,8 +72,6 @@ code(
     "sys.path.insert(0, os.path.join(os.getcwd(), 'src'))\n"
     "import time\n"
     "\n"
-    "import matplotlib\n"
-    "matplotlib.use(\"Agg\")\n"
     "import matplotlib.pyplot as plt\n"
     "import ollama\n"
     "import pandas as pd\n"
@@ -59,7 +79,7 @@ code(
     "import sdn_env\n"
     "import tools\n"
     "from llm_controller import LlmController\n"
-    "from visualization import plot_paths, render_state_ascii\n"
+    "from visualization import draw_state, plot_paths, render_state_ascii\n"
     "\n"
     "plt.rcParams[\"font.family\"] = \"DejaVu Sans\"\n"
     "print(\"Імпорт виконано\")",
@@ -128,10 +148,23 @@ code(
     "\n"
     "print(f\"Вузлів: {graph.number_of_nodes()}, ребер: {graph.number_of_edges()}\")\n"
     "print(f\"Відправник: {sdn_env.SOURCE}, отримувач: {sdn_env.DESTINATION}\")\n"
-    "print(f\"Оптимум (Дейкстра): {opt_delay} мс, {len(opt_path)} вузлів\")",
-    f"Вузлів: {T['num_nodes']}, ребер: {T['num_edges']}\n"
-    f"Відправник: {T['source']}, отримувач: {T['destination']}\n"
-    f"Оптимум (Дейкстра): {T['opt_delay']} мс, {len(T['opt_path'])} вузлів\n",
+    "print(f\"Оптимум (Дейкстра): {opt_delay} мс, {len(opt_path)} вузлів\")\n"
+    "\n"
+    "# Графічне зображення топології та оптимального шляху\n"
+    "fig, ax = plt.subplots(figsize=(9, 8))\n"
+    "draw_state(graph, opt_path, sdn_env.SOURCE, sdn_env.DESTINATION, ax,\n"
+    "           f\"Топологія (затримки в мс), оптимальний шлях {opt_delay} мс\")\n"
+    "plt.tight_layout()\n"
+    "plt.show()\n"
+    "\n"
+    "print(render_state_ascii(graph, opt_path, sdn_env.SOURCE, sdn_env.DESTINATION))",
+    out_text=(
+        f"Вузлів: {T['num_nodes']}, ребер: {T['num_edges']}\n"
+        f"Відправник: {T['source']}, отримувач: {T['destination']}\n"
+        f"Оптимум (Дейкстра): {T['opt_delay']} мс, {len(T['opt_path'])} вузлів\n"
+        f"{ASCII_TOPO}\n"
+    ),
+    image_path=os.path.join(ROOT, "figures", "topology.png"),
 )
 
 md("## 6. Частина 2. Середовище та інструменти контролера")
