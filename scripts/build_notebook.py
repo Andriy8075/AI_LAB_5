@@ -10,7 +10,8 @@ sys.stdout.reconfigure(encoding='utf-8')
 import nbformat as nbf
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-RESULTS = json.load(open(os.path.join(BASE, "outputs", "lab5_results.json"),
+ROOT = os.path.dirname(BASE)
+RESULTS = json.load(open(os.path.join(ROOT, "outputs", "lab5_results.json"),
                          encoding="utf-8"))
 Q = RESULTS["quantized"]
 F = RESULTS["fp16"]
@@ -46,6 +47,7 @@ code(
     "import json\n"
     "import os\n"
     "import sys\n"
+    "sys.path.insert(0, os.path.join(os.getcwd(), 'src'))\n"
     "import time\n"
     "\n"
     "import matplotlib\n"
@@ -252,7 +254,7 @@ nb.metadata = {
         "version": "3.8.3",
     },
 }
-out = os.path.join(BASE, "lab5.ipynb")
+out = os.path.join(ROOT, "lab5.ipynb")
 with open(out, "w", encoding="utf-8") as f:
     nbf.write(nb, f)
 print("Блокнот збережено:", out, "| клітинок:", len(cells))

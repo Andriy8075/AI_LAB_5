@@ -18,8 +18,9 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt, Cm, RGBColor
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-RESULTS_PATH = os.path.join(BASE, "outputs", "lab5_results.json")
-FIG_PATHS = os.path.join(BASE, "figures", "paths.png")
+ROOT = os.path.dirname(BASE)
+RESULTS_PATH = os.path.join(ROOT, "outputs", "lab5_results.json")
+FIG_PATHS = os.path.join(ROOT, "figures", "paths.png")
 
 FONT_BODY = "Times New Roman"
 FONT_CODE = "Consolas"
@@ -144,7 +145,7 @@ def add_table(doc, headers, rows):
 
 
 def read_file(rel_path):
-    with open(os.path.join(BASE, rel_path), encoding="utf-8") as f:
+    with open(os.path.join(ROOT, rel_path), encoding="utf-8") as f:
         return f.read()
 
 
@@ -154,12 +155,12 @@ def main():
     fp16 = results["fp16"]
     topo = results["topology"]
 
-    p1_path = os.path.join(BASE, "outputs", "part1_benchmark.json")
+    p1_path = os.path.join(ROOT, "outputs", "part1_benchmark.json")
     part1 = json.load(open(p1_path, encoding="utf-8")) if os.path.exists(p1_path) else {}
 
-    code_env = read_file("sdn_env.py")
-    code_tools = read_file("tools.py")
-    code_llm = read_file("llm_controller.py")
+    code_env = read_file(os.path.join("src", "sdn_env.py"))
+    code_tools = read_file(os.path.join("src", "tools.py"))
+    code_llm = read_file(os.path.join("src", "llm_controller.py"))
 
     doc = Document()
     style = doc.styles["Normal"]
@@ -418,7 +419,7 @@ def main():
         "інференс і знижує навантаження на пам'ять.",
     )
 
-    out_path = os.path.join(BASE, "Lab5_report.docx")
+    out_path = os.path.join(ROOT, "Lab5_report.docx")
     doc.save(out_path)
     print("Звіт збережено:", out_path)
 

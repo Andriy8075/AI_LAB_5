@@ -17,6 +17,9 @@ matplotlib.use("Agg")  # без графічного вікна (для фоно
 import ollama
 import pandas as pd
 
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "src"))
+
 import sdn_env
 import tools
 from llm_controller import LlmController
@@ -25,8 +28,8 @@ from visualization import plot_paths, render_state_ascii
 QUANTIZED_MODEL = "qwen2.5:3b"
 FP16_MODEL = "qwen2.5:3b-instruct-fp16"
 
-OUT_DIR = "outputs"
-FIG_DIR = "figures"
+OUT_DIR = os.path.join(ROOT, "outputs")
+FIG_DIR = os.path.join(ROOT, "figures")
 
 
 def model_size_gb(model):
