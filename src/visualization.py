@@ -1,6 +1,7 @@
 """Візуалізація результатів LLM-контролера (лабораторна робота 5)."""
 
 import math
+import os
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -13,7 +14,12 @@ def render_state_ascii(graph, path, source, destination, head=None):
     """ASCII-зображення сітки з виділеним шляхом і головою потоку."""
     side = graph.graph["side"]
     src, dst = parse_address(source), parse_address(destination)
-    path_edges = {frozenset(e) for e in zip(path, path[1:])}
+    path_nodes = [
+        parse_address(p) if isinstance(p, str) else tuple(p) for p in path
+    ]
+    path_edges = {frozenset(e) for e in zip(path_nodes, path_nodes[1:])}
+    if head is not None and isinstance(head, str):
+        head = parse_address(head)
 
     def symbol(n):
         if n == head:
@@ -22,7 +28,7 @@ def render_state_ascii(graph, path, source, destination, head=None):
             return "S"
         if n == dst:
             return "D"
-        if n in path:
+        if n in path_nodes:
             return "#"
         return "."
 
@@ -58,7 +64,12 @@ def draw_state(graph, path, source, destination, ax, title, head=None):
     """Малює сітку, виділяє шлях і голову потоку, підписує затримки (мс)."""
     pos = {n: (d["col"], -d["row"]) for n, d in graph.nodes(data=True)}
     src, dst = parse_address(source), parse_address(destination)
-    path_edges = {frozenset(e) for e in zip(path, path[1:])}
+    path_nodes = [
+        parse_address(p) if isinstance(p, str) else tuple(p) for p in path
+    ]
+    path_edges = {frozenset(e) for e in zip(path_nodes, path_nodes[1:])}
+    if head is not None and isinstance(head, str):
+        head = parse_address(head)
 
     def color(n):
         if n == head:
@@ -67,7 +78,7 @@ def draw_state(graph, path, source, destination, ax, title, head=None):
             return "lightgreen"
         if n == dst:
             return "lightcoral"
-        if n in path:
+        if n in path_nodes:
             return "khaki"
         return "white"
 
@@ -79,33 +90,39 @@ def draw_state(graph, path, source, destination, ax, title, head=None):
     nx.draw_networkx_edges(graph, pos, edgelist=on_path, ax=ax, width=4,
                            edge_color="forestgreen")
     nx.draw_networkx_nodes(
-        graph, pos, ax=ax, node_size=1500, node_color=[color(n) for n in graph.nodes],
+        graph, pos, ax=ax, node_size=1200, node_color=[color(n) for n in graph.nodes],
         edgecolors=["blue" if n in (src, dst) else "black" for n in graph.nodes],
         linewidths=[3 if n in (src, dst) else 1 for n in graph.nodes],
     )
-    labels = {n: node_address(n) + ("\nS" if n == src else "\nD" if n == dst else "")
-              for n in graph.nodes}
-    nx.draw_networkx_labels(graph, pos, labels=labels, ax=ax, font_size=7)
+    labels = {
+        n: node_address(n) + ("\nS" if n == src else "\nD" if n == dst else "")
+        for n in graph.nodes
+    }
+    nx.draw_networkx_labels(graph, pos, labels=labels, ax=ax, font_size=6)
     nx.draw_networkx_edge_labels(
-        graph, pos, ax=ax, font_size=9, font_color="crimson",
+        graph, pos, ax=ax, font_size=8, font_color="crimson",
         edge_labels={(u, v): graph[u][v]["weight"] for u, v in graph.edges},
         bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none"),
     )
-    ax.set_title(title)
+    ax.set_title(title, fontsize=11)
     ax.set_axis_off()
 
 
 def plot_paths(graph, results, source, destination, filename=None):
-    """Два графіки: шлях квантованої та неквантованої моделі."""
-    fig, axes = plt.subplots(1, 2, figsize=(18, 9))
-    q = results["quantized"]
-    f = results["fp16"]
-    q_title = (f"Квантована модель: шлях {q['delay']} мс ({q['nodes']} вузлів)"
-               if q.get("finished") else "Квантована модель: не завершено")
-    f_title = (f"Неквантована модель (FP16): шлях {f['delay']} мс ({f['nodes']} вузлів)"
-               if f.get("finished") else "Неквантована модель (FP16): не завершено")
-    draw_state(graph, q["path"], source, destination, axes[0], q_title)
-    draw_state(graph, f["path"], source, destination, axes[1], f_title)
+    """Два графіки: шляхи двох прогонів (напр. Q4 vs Q8)."""
+    keys = list(results.keys())[:2]
+    fig, axes = plt.subplots(1, max(2, len(keys)), figsize=(18, 9))
+    axes = np.asarray(axes).ravel()
+    for i, key in enumerate(keys):
+        r = results[key]
+        path = r.get("path") or []
+        delay = r.get("delay")
+        if delay is None and r.get("last_path_result"):
+            delay = r["last_path_result"].get("delay_ms")
+        title = f"{key}: шлях {delay} мс" if delay is not None else f"{key}"
+        draw_state(graph, path, source, destination, axes[i], title)
+    for j in range(len(keys), len(axes)):
+        axes[j].set_axis_off()
     plt.tight_layout()
     if filename:
         plt.savefig(filename, dpi=120, bbox_inches="tight")
@@ -113,31 +130,51 @@ def plot_paths(graph, results, source, destination, filename=None):
     return fig
 
 
+def plot_single_path(graph, path, source, destination, title=None, filename=None):
+    fig, ax = plt.subplots(1, 1, figsize=(10, 9))
+    draw_state(graph, path, source, destination, ax, title or "Шлях")
+    plt.tight_layout()
+    if filename:
+        os.makedirs(os.path.dirname(filename) or ".", exist_ok=True)
+        plt.savefig(filename, dpi=120, bbox_inches="tight")
+    plt.close(fig)
+    return filename
+
+
 def action_label(action):
-    """Короткий підпис дії агента, напр. install_flow(S) або get_link_stats(10.0.1.0)."""
     name = action["tool"]
     args = action.get("arguments", {})
+    if "interface" in args:
+        return f"{name}({args['interface']})"
     if "direction" in args:
         return f"{name}({args['direction']})"
     if "node" in args:
         return f"{name}({args['node']})"
+    if "src" in args and "dst" in args:
+        return f"{name}({args['src']}→{args['dst']})"
+    if "a" in args and "b" in args:
+        return f"{name}({args['a']}—{args['b']})"
     return name
 
 
 def plot_step_sequence(graph, snapshots, source, destination, title=None,
                        filename=None, cols=6):
-    """Сітка графіків: по одному на кожен крок (стан мережі після кроку)."""
+    """Залишено для сумісності: сітка кроків (краще використовувати save_step_figures)."""
     n = len(snapshots)
+    if n == 0:
+        return None
     rows = math.ceil(n / cols)
     fig, axes = plt.subplots(rows, cols, figsize=(cols * 3.4, rows * 3.2))
     axes = np.asarray(axes).ravel()
     for i, snap in enumerate(snapshots):
-        head = parse_address(snap["head"]) if snap.get("head") else None
-        path = [tuple(p) for p in snap["path"]]
+        head = snap.get("head")
+        path = snap.get("path") or []
         actions = ", ".join(action_label(a) for a in snap.get("actions", [])) or "—"
-        label = (f"Крок {snap['step']}: {actions}\n"
-                 f"голова {snap['head']} | правил {snap.get('installed', 0)}, "
-                 f"відкликано {snap.get('revoked', 0)}")
+        label = (
+            f"Крок {snap['step']}: {actions}\n"
+            f"голова {snap['head']} | правил {snap.get('installed', 0)}, "
+            f"відкликано {snap.get('revoked', 0)}"
+        )
         draw_state(graph, path, source, destination, axes[i], label, head=head)
     for j in range(n, len(axes)):
         axes[j].set_axis_off()
@@ -146,5 +183,30 @@ def plot_step_sequence(graph, snapshots, source, destination, title=None,
     plt.tight_layout(rect=[0, 0, 1, 0.97])
     if filename:
         plt.savefig(filename, dpi=110, bbox_inches="tight")
-    plt.show()
+    plt.close(fig)
     return fig
+
+
+def save_step_figures(graph, snapshots, source, destination, out_dir,
+                      prefix="step"):
+    """Зберігає ОКРЕМЕ зображення мережі на кожен крок."""
+    os.makedirs(out_dir, exist_ok=True)
+    paths = []
+    for snap in snapshots:
+        step = snap.get("step", len(paths) + 1)
+        head = snap.get("head")
+        path = snap.get("path") or []
+        actions = ", ".join(action_label(a) for a in snap.get("actions", [])) or "—"
+        label = (
+            f"Крок {step}: {actions}\n"
+            f"голова {head} | правил {snap.get('installed', 0)}, "
+            f"відкликано {snap.get('revoked', 0)}"
+        )
+        fname = os.path.join(out_dir, f"{prefix}_{step:02d}.png")
+        fig, ax = plt.subplots(1, 1, figsize=(10, 9))
+        draw_state(graph, path, source, destination, ax, label, head=head)
+        plt.tight_layout()
+        plt.savefig(fname, dpi=120, bbox_inches="tight")
+        plt.close(fig)
+        paths.append(fname)
+    return paths

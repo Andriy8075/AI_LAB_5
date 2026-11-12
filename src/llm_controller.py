@@ -1,13 +1,7 @@
-"""LLM-контролер: агент на основі великої мовної моделі (Ollama).
+"""LLM-агент: NL-інтерфейс до SDN-контролера через tool calling.
 
-Агент отримує системний промпт із завданням маршрутизації та набір
-інструментів (tools) і в циклі:
-  1) надсилає повідомлення моделі;
-  2) якщо модель повернула tool_calls — виконує їх через SdnToolbox
-     і додає результати в історію;
-  3) повторює, поки не викликано finish_flow або не вичерпано ліміт кроків.
-
-Збирає метрики: кількість викликів моделі, викликів інструментів, час.
+Модель не обчислює шлях сама — лише викликає інструменти контролера
+і формулює відповідь оператору.
 """
 
 import json
@@ -16,31 +10,36 @@ import time
 import ollama
 
 SYSTEM_PROMPT = (
-    "Ти — SDN-контролер програмно-конфігурованої мережі. Проклади потік від "
-    "відправника до отримувача в мережі-сітці. Ти керуєш «головою потоку»: на "
-    "кожному кроці можеш перемістити її на один крок у напрямку N (вгору), "
-    "E (праворуч), S (вниз) або W (ліворуч). Мета — довести голову потоку до "
-    "отримувача з мінімальною сумарною затримкою каналів (мс).\n"
-    "Алгоритм дій на кожному кроці:\n"
-    "1) Виклич get_flow_state(), щоб дізнатися поточний вузол і його "
-    "cost_to_destination (мінімальна залишкова затримка до отримувача).\n"
-    "2) Виклич get_link_stats(node) для поточного вузла. Обери напрямок, у "
-    "якого сусід має НАЙМЕНШИЙ cost_to_destination.\n"
-    "3) Перемістись у цей бік через install_flow(direction).\n"
-    "4) Якщо поточний cost_to_destination == 0 (голова вже в отримувачі) — "
-    "виклич finish_flow().\n"
-    "5) Якщо помилився напрямком — виклич revoke_flow(), щоб повернутися.\n"
-    "ВАЖЛИВО: у КОЖНІЙ відповіді викликай РІВНО ОДИН інструмент і не додавай "
-    "жодного тексту чи пояснень."
+    "Ти — NL-інтерфейс SDN-контролера програмно-конфігурованої мережі. "
+    "Оператор формулює намір природною мовою. Ти НЕ обчислюєш шлях і НЕ "
+    "встановлюєш правила текстом: усі дії лише через інструменти. Стан "
+    "контролера — єдине джерело істини.\n"
+    "Доступні інструменти:\n"
+    "- get_flow_state() — голова потоку, отримувач, встановлені правила;\n"
+    "- get_link_stats(node) — затримки та пропускна здатність каналів вузла;\n"
+    "- install_rule(interface) — N/E/S/W або revoke;\n"
+    "- install_path(src, dst, avoid) — повний шлях knowledge-based контролером "
+    "(prefer цей інструмент для прокладання шляху);\n"
+    "- get_topology() — база знань (вузли й канали);\n"
+    "- simulate_link_failure(a, b) — вихід каналу з ладу.\n"
+    "Правила:\n"
+    "1) Для прокладання шляху викликай install_path з потрібними src/dst/avoid.\n"
+    "2) Якщо запит неможливий (неіснуючий вузол тощо) — спробуй tool, "
+    "отримай помилку й чесно поясни оператору.\n"
+    "3) Після виконання інструментів дай коротку відповідь українською з "
+    "фактами зі стану контролера (шлях, затримка, час передачі, вузьке місце).\n"
+    "4) Не вигадуй результати tools.\n"
+    "5) Відповідь оператору — коротка (кілька речень), без повного дампу топології.\n"
+    "6) Після simulate_link_failure одразу виклич install_path для перебудови."
 )
 
 
 class LlmController:
-    """Агент, що керує мережею через виклики інструментів моделлю."""
+    """Агент, що обробляє NL-запит через виклики інструментів."""
 
     def __init__(self, model, toolbox, system_prompt=SYSTEM_PROMPT,
-                 temperature=0.0, num_ctx=4096, max_steps=80,
-                 num_gpu=0, verbose=True):
+                 temperature=0.0, num_ctx=8192, max_steps=40,
+                 num_gpu=0, verbose=True, num_predict=384):
         self.model = model
         self.toolbox = toolbox
         self.system_prompt = system_prompt
@@ -49,20 +48,23 @@ class LlmController:
         self.max_steps = max_steps
         self.num_gpu = num_gpu
         self.verbose = verbose
+        self.num_predict = num_predict
 
-
-    def run(self):
+    def run(self, user_query: str):
         tools = self.toolbox.tool_schemas()
-        messages = [{"role": "system", "content": self.system_prompt}]
+        messages = [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": user_query},
+        ]
         log = []
         llm_calls = 0
         tool_calls_total = 0
         llm_time_s = 0.0
         eval_tokens = 0
         prompt_tokens = 0
-        finished = False
-        no_tool_streak = 0
+        final_answer = ""
         snapshots = []
+        no_tool_streak = 0
 
         for step in range(1, self.max_steps + 1):
             t0 = time.perf_counter()
@@ -75,6 +77,7 @@ class LlmController:
                         "temperature": self.temperature,
                         "num_ctx": self.num_ctx,
                         "num_gpu": self.num_gpu,
+                        "num_predict": self.num_predict,
                     },
                 )
             except Exception as exc:
@@ -93,39 +96,64 @@ class LlmController:
             content = msg.get("content") or ""
             tool_calls = msg.get("tool_calls") or []
 
-            eval_tokens += resp.get("eval_count", 0)
-            prompt_tokens += resp.get("prompt_eval_count", 0)
+            eval_tokens += resp.get("eval_count", 0) or 0
+            prompt_tokens += resp.get("prompt_eval_count", 0) or 0
 
             if self.verbose:
-                names = [c.function.name for c in tool_calls] or ["(без викликів)"]
+                names = [c.function.name for c in tool_calls] or ["(відповідь)"]
                 print(
                     f"  [крок {step:>2}] {elapsed:5.2f} с | токени "
                     f"{resp.get('prompt_eval_count', 0)}->{resp.get('eval_count', 0)} "
-                    f"| виклики: {', '.join(names)}",
+                    f"| {', '.join(names)}",
                     flush=True,
                 )
 
             if tool_calls:
-                # зберігаємо відповідь асистента ТІЛЬКИ з викликами (без тексту),
-                # щоб модель не «заговорювалася» замість викликів інструментів
                 messages.append({
                     "role": "assistant",
-                    "content": "",
+                    "content": content or "",
                     "tool_calls": tool_calls,
                 })
                 no_tool_streak = 0
+            else:
+                messages.append({"role": "assistant", "content": content})
+                final_answer = content.strip()
+                no_tool_streak += 1
+                log.append({
+                    "step": step, "tool": "(відповідь)",
+                    "arguments": {}, "status": "answer",
+                    "result": content,
+                    "llm_time_s": elapsed,
+                })
+                # якщо вже були tools або модель відповіла текстом — завершуємо
+                if tool_calls_total > 0 or no_tool_streak >= 1:
+                    break
+                messages.append({
+                    "role": "user",
+                    "content": (
+                        "Спочатку виклич потрібні інструменти контролера "
+                        "(для шляху — install_path; не викликай get_topology "
+                        "без потреби), потім коротку відповідь."
+                    ),
+                })
+                continue
 
             step_actions = []
             for call in tool_calls:
                 fn = call.function
                 name = fn.name
                 arguments = fn.arguments or {}
+                if isinstance(arguments, str):
+                    try:
+                        arguments = json.loads(arguments)
+                    except json.JSONDecodeError:
+                        arguments = {}
                 tool_calls_total += 1
                 try:
                     result = self.toolbox.dispatch(name, arguments)
                     result_text = json.dumps(result, ensure_ascii=False)
                     status = "ok"
-                except Exception as exc:  # ToolError та інші помилки
+                except Exception as exc:
                     result_text = json.dumps({"error": str(exc)}, ensure_ascii=False)
                     status = "error"
 
@@ -142,58 +170,32 @@ class LlmController:
                 step_actions.append({
                     "tool": name, "arguments": dict(arguments), "status": status,
                 })
-                if name == "finish_flow" and status == "ok":
-                    finished = True
 
-            # Знімок стану після цього кроку (для покрокової візуалізації)
             state = self.toolbox.env.flow_state()
             snapshots.append({
                 "step": step,
                 "head": state["head"],
-                "path": list(self.toolbox.env.path()),
+                "path": list(state["path"]),
                 "installed": self.toolbox.env.installed,
                 "revoked": self.toolbox.env.revoked,
                 "actions": step_actions,
             })
 
-            if finished:
-                break
+            # якщо install_path повернув внутрішні snapshots — зберегти
+            if self.toolbox.last_path_result and self.toolbox.last_path_result.get(
+                "snapshots"
+            ):
+                # не дублюємо на кожному кроці; оновлюємо посилання
+                pass
 
-            if not tool_calls:
-                no_tool_streak += 1
-                state = self.toolbox.env.flow_state()
-                if state["at_destination"]:
-                    log.append({
-                        "step": step, "tool": "(жодного виклику)",
-                        "arguments": {}, "status": "finish-implicit",
-                        "result": json.dumps(state, ensure_ascii=False),
-                        "llm_time_s": elapsed,
-                    })
-                    finished = True
-                    break
-                if no_tool_streak >= 3:
-                    log.append({
-                        "step": step, "tool": "(жодного виклику)",
-                        "arguments": {}, "status": "stuck",
-                        "result": json.dumps(
-                            {"note": "модель 3 рази поспіль не викликала інструмент"},
-                            ensure_ascii=False,
-                        ),
-                        "llm_time_s": elapsed,
-                    })
-                    break
-                messages.append({
-                    "role": "user",
-                    "content": (
-                        "Виклич ОДИН інструмент (get_flow_state, get_link_stats, "
-                        "install_flow, revoke_flow або finish_flow). Без тексту."
-                    ),
-                })
-
+        path_snaps = []
+        if self.toolbox.last_path_result:
+            path_snaps = self.toolbox.last_path_result.get("snapshots") or []
 
         return {
             "model": self.model,
-            "finished": finished,
+            "query": user_query,
+            "answer": final_answer,
             "steps": llm_calls,
             "tool_calls": tool_calls_total,
             "llm_time_s": llm_time_s,
@@ -201,6 +203,7 @@ class LlmController:
             "prompt_tokens": prompt_tokens,
             "log": log,
             "snapshots": snapshots,
+            "path_snapshots": path_snaps,
             "flow_state": self.toolbox.env.flow_state(),
             "path": self.toolbox.env.path(),
             "delay": self.toolbox.env.path_delay(),
@@ -208,4 +211,37 @@ class LlmController:
             "installed": self.toolbox.env.installed,
             "revoked": self.toolbox.env.revoked,
             "tool_summary": self.toolbox.summary(),
+            "last_path_result": self.toolbox.last_path_result,
+            "transfer": self.toolbox.env.transfer_stats(),
+        }
+
+    def explain_route(self, journal_text: str, model=None):
+        """Частина 3: пояснення маршруту без tools (окремий чат)."""
+        model = model or self.model
+        prompt = (
+            "Ти пояснюєш оператору SDN, чому контролер обрав саме такий шлях. "
+            "Нижче — журнал роботи контролера. Поясни українською: (1) чому "
+            "обрано цей шлях; (2) де втрачено час або затримку порівняно з "
+            "оптимальним шляхом. Спирайся лише на наведені факти.\n\n"
+            f"{journal_text}"
+        )
+        t0 = time.perf_counter()
+        resp = ollama.chat(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            options={
+                "temperature": 0.0,
+                "num_ctx": self.num_ctx,
+                "num_gpu": self.num_gpu,
+                "num_predict": max(768, self.num_predict),
+            },
+        )
+        elapsed = time.perf_counter() - t0
+        text = (resp.get("message") or {}).get("content") or ""
+        return {
+            "explanation": text.strip(),
+            "llm_time_s": elapsed,
+            "eval_tokens": resp.get("eval_count", 0) or 0,
+            "prompt_tokens": resp.get("prompt_eval_count", 0) or 0,
+            "model": model,
         }

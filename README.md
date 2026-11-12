@@ -1,171 +1,52 @@
-# Лабораторна робота 5 — Інструкція до Частини 1
+# Лабораторна робота 5 — Великі мовні моделі
 
-Локальний запуск мовної моделі та вимірювання її характеристик.
+NL-інтерфейс SDN-контролера через Ollama tool calling (частини 1–4 за PDF).
 
-## Що вже встановлено (ваше середовище)
+## Середовище
 
-- **Ollama** 0.40.15 (сервер запускається автоматично у фоновому режимі).
-- **Моделі Qwen2.5-3B** (3.1 млрд параметрів, підтримує виклик інструментів):
+- Ollama + моделі `qwen2.5:3b` (Q4_K_M), `qwen2.5:3b-instruct-q8_0`, опційно FP16
+- Python: `ollama`, `psutil`, `pandas`, `networkx`, `matplotlib`, `nbformat`, `python-docx`
 
-| Команда моделі (тег) | Квантування | Розмір файлу |
-|---|---|---|
-| `qwen2.5:3b-instruct-fp16` | FP16 (без квантування) | ~6.18 ГБ |
-| `qwen2.5:3b-instruct-q8_0` | Q8_0 (8-біт) | ~3.29 ГБ |
-| `qwen2.5:3b` | Q4_K_M (4-біт) | ~1.93 ГБ |
+Інференс на цьому ПК — **CPU** (`num_gpu=0`).
 
-- **Python** 3.8 + бібліотеки `ollama`, `psutil`, `pandas` (уже встановлені).
-
-> **Важливо про GPU.** Драйвер NVIDIA на цьому ноутбуці застарий для CUDA-ядра
-> Ollama, тому під час вимірювань використовується **CPU** (`num_gpu=0`),
-> а вимірюється **оперативна пам'ять** (не відеопам'ять).
-
----
-
-## Спосіб 1. Готовий скрипт (найшвидше)
-
-Відкрийте PowerShell і виконайте:
+## Швидкий запуск
 
 ```powershell
 cd c:\Users\Admin\projects\ai_labs\lab5
-python benchmark_part1.py
+python benchmark_part1.py          # частина 1 (якщо треба перезамір)
+python scripts/run_part2.py        # 5 NL-сценаріїв + покрокові PNG
+python scripts/run_part3.py        # пояснення маршруту
+python scripts/run_part4.py        # ≥10 запитів × Q4 і Q8
+python scripts/generate_steps.py   # перегенерація окремих фото кроків
+python scripts/build_notebook.py   # lab5.ipynb
+python scripts/build_report.py     # Lab5_report.docx
 ```
 
-Скрипт для кожної моделі (FP16 → Q8_0 → Q4_K_M):
-1. вимірює розмір файлу та обсяг використаної RAM;
-2. на запиті довжиною **452 токени** вимірює швидкість обробки запиту та
-   швидкість генерації;
-3. повторює вимірювання **3 рази** і усереднює (перед кожним заміром модель
-   вивантажується, щоб скинути KV-кеш).
-
-Результати зберігаються у `outputs/part1_benchmark.json` і друкуються у консоль.
-
----
-
-## Спосіб 2. Вручну в Jupyter-ноутбуці
-
-### Крок 1. Запустіть Jupyter
-
-```powershell
-cd c:\Users\Admin\projects\ai_labs\lab5
-jupyter notebook
-```
-
-Створіть новий блокнот і вставляйте код клітинками.
-
-### Крок 2. Підключення та параметри
-
-```python
-import ollama
-import psutil
-
-# Виберіть одну модель (міняйте для другого вимірювання):
-MODEL = "qwen2.5:3b"              # перша (квантована Q4_K_M)
-# MODEL = "qwen2.5:3b-instruct-fp16"  # друга (неквантована FP16)
-
-# Запит довжиною >= 200 токенів (однаковий для всіх моделей)
-PROMPT = (
-    "Поясни детально, як працює протокол динамічної маршрутизації OSPF у "
-    "комп'ютерних мережах. Опиши його основні компоненти: повідомлення Hello, "
-    "оголошення про стан каналів (LSA), базу даних станів каналів (LSDB) та "
-    "алгоритм Дейкстри. Розкажи, як маршрутизатори обмінюються інформацією, "
-    "як будується карта мережі та як обчислюються найкоротші шляхи до кожної "
-    "підмережі. Порівняй OSPF з протоколом RIP за критеріями швидкості "
-    "збіжності, масштабованості, типу метрики та споживання ресурсів. Наведи "
-    "конкретний приклад мережі з чотирма маршрутизаторами, з'єднаними різними "
-    "каналами з різною вартістю, і поясни покроково, який маршрут обере OSPF "
-    "між двома віддаленими вузлами."
-)
-```
-
-### Крок 3. Розмір файлу моделі
-
-```python
-for m in ollama.list()["models"]:
-    if m["model"] == MODEL:
-        print("Розмір файлу моделі:", round(m["size"] / 1e9, 2), "ГБ")
-```
-
-### Крок 4. Обсяг використаної RAM під час роботи
-
-```python
-vm = psutil.virtual_memory()
-used_before = (vm.total - vm.available) / 1e9
-
-# прогрів — завантажує модель у пам'ять
-ollama.generate(model=MODEL, prompt="Привіт",
-                options={"num_predict": 4, "num_gpu": 0})
-
-vm = psutil.virtual_memory()
-used_after = (vm.total - vm.available) / 1e9
-print("Використана RAM:", round(used_after - used_before, 2), "ГБ")
-```
-
-### Крок 5. Швидкість обробки запиту та генерації (3 рази)
-
-```python
-for rep in range(1, 4):
-    resp = ollama.generate(
-        model=MODEL,
-        prompt=PROMPT,
-        options={"num_predict": 128, "temperature": 0.0, "num_gpu": 0},
-    )
-    prompt_tok_s = resp["prompt_eval_count"] / (resp["prompt_eval_duration"] / 1e9)
-    gen_tok_s = resp["eval_count"] / (resp["eval_duration"] / 1e9)
-    print(f"Спроба {rep}: обробка запиту {prompt_tok_s:.2f} ток/с, "
-          f"генерація {gen_tok_s:.2f} ток/с")
-```
-
-> Порада: щоб кожна спроба вимірювала «холодну» обробку запиту (без KV-кешу),
-> перед кожною спробою вивантажте модель:
-> `ollama.chat(model=MODEL, messages=[{"role":"user","content":" "}],
-> options={"num_predict":1,"num_gpu":0}, keep_alive=0)`.
-
-### Крок 6. Повторіть для другої моделі
-
-Змініть `MODEL` на інший тег (наприклад `qwen2.5:3b-instruct-fp16`) і виконайте
-клітинки 3–5 ще раз. Результати зведіть у таблицю (розмір, RAM, ток/с обробки,
-ток/с генерації) для кожного варіанту квантування.
-
----
-
-## Орієнтовні результати (уже отримані на цьому ПК, CPU)
-
-| Модель | Квантування | Розмір, ГБ | RAM, ГБ | Обробка запиту, ток/с | Генерація, ток/с |
-|---|---|---|---|---|---|
-| Qwen2.5-3B FP16 | FP16 | 6.18 | 6.30 | 59.61 | 6.56 |
-| Qwen2.5-3B Q8_0 | Q8_0 | 3.29 | 3.53 | 60.72 | 9.87 |
-| Qwen2.5-3B Q4_K_M | Q4_K_M | 1.93 | 2.29 | 113.36 | 12.53 |
-
-## Корисні команди Ollama
-
-```powershell
-ollama list            # список завантажених моделей і розміри
-ollama ps              # які моделі зараз завантажені в пам'ять
-ollama stop <model>    # вивантажити модель з пам'яті
-```
-
----
-
-## Структура проєкту
+## Структура
 
 ```
 lab5/
-├── Lab5 (2).pdf            # завдання лабораторної роботи
-├── Lab5_report.docx        # звіт
-├── lab5.ipynb              # ноутбук (Частина 1 + Частина 2)
-├── benchmark_part1.py      # бенчмарк Частини 1 (запуск: python benchmark_part1.py)
-├── README.md               # ця інструкція
-├── requirements.txt        # залежності Python
-├── src/                    # код, який імпортує ноутбук і скрипти
-│   ├── sdn_env.py          #   топологія та середовище (площина даних)
-│   ├── tools.py            #   інструменти контролера (get_flow_state тощо)
-│   ├── llm_controller.py   #   LLM-агент (цикл виклику інструментів)
-│   └── visualization.py    #   візуалізація шляхів
-├── scripts/                # службові скрипти (для перегенерації звіту/ноутбука)
-│   ├── run_lab5.py         #   запуск Частини 2 (обидві моделі)
-│   ├── build_report.py     #   генерація Lab5_report.docx
-│   └── build_notebook.py   #   генерація lab5.ipynb
-├── outputs/                # результати вимірювань (JSON, ASCII)
-└── figures/                # згенеровані рисунки
+├── lab5.ipynb
+├── Lab5_report.docx
+├── Lab5 (2).pdf
+├── benchmark_part1.py
+├── src/
+│   ├── sdn_env.py          # 5×5, delay+BW, failure
+│   ├── knowledge.py        # KB + install_full_path(avoid)
+│   ├── tools.py            # PDF tool API
+│   ├── llm_controller.py   # NL-агент
+│   └── visualization.py    # окремі PNG на крок
+├── scripts/
+│   ├── run_part2.py
+│   ├── run_part3.py
+│   ├── run_part4.py
+│   ├── generate_steps.py
+│   ├── build_notebook.py
+│   └── build_report.py
+├── outputs/                # JSON результатів
+└── figures/                # topology, paths, part2_*/steps/step_XX.png
 ```
 
+## Інструменти (частина 2)
+
+`get_flow_state`, `get_link_stats`, `install_rule`, `install_path`, `get_topology`, `simulate_link_failure`.
