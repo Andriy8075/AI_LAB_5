@@ -195,6 +195,21 @@ def main():
         json.dump(results, f, ensure_ascii=False, indent=2)
     print("Збережено:", out_path, flush=True)
 
+    # Зручний для читання чат (HTML + Markdown + окремі .txt відповідей)
+    try:
+        import importlib.util
+        _chat_path = os.path.join(os.path.dirname(__file__), "export_part2_chat.py")
+        _spec = importlib.util.spec_from_file_location("export_part2_chat", _chat_path)
+        _mod = importlib.util.module_from_spec(_spec)
+        _spec.loader.exec_module(_mod)
+        chat_paths = _mod.export_from_part2(results)
+        print("Чат HTML:", chat_paths["html"], flush=True)
+        print("Чат Markdown:", chat_paths["markdown"], flush=True)
+        for p in chat_paths["answers"]:
+            print("Відповідь:", p, flush=True)
+    except Exception as exc:
+        print(f"(не вдалося експортувати чат: {exc})", flush=True)
+
 
 if __name__ == "__main__":
     main()

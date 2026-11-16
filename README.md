@@ -15,12 +15,19 @@ NL-інтерфейс SDN-контролера через Ollama tool calling (�
 cd c:\Users\Admin\projects\ai_labs\lab5
 python benchmark_part1.py          # частина 1 (якщо треба перезамір)
 python scripts/run_part2.py        # 5 NL-сценаріїв + покрокові PNG
+python scripts/export_part2_chat.py # HTML/Markdown-чат з відповідями Qwen
 python scripts/run_part3.py        # пояснення маршруту
 python scripts/run_part4.py        # ≥10 запитів × Q4 і Q8
 python scripts/generate_steps.py   # перегенерація окремих фото кроків
 python scripts/build_notebook.py   # lab5.ipynb
 python scripts/build_report.py     # Lab5_report.docx
 ```
+
+Читабельні відповіді частини 2 (без прокрутки JSON вправо):
+- `outputs/part2_chat.html` — відкрити в браузері (бульбашки чату)
+- `outputs/part2_chat.md` — Markdown
+- `outputs/part2_answers/*.txt` — лише фінальний текст Qwen по сценаріях
+
 
 ## Структура
 
