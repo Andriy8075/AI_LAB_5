@@ -28,6 +28,11 @@ python scripts/build_report.py     # Lab5_report.docx
 - `outputs/part2_chat.md` — Markdown
 - `outputs/part2_answers/*.txt` — лише фінальний текст Qwen по сценаріях
 
+## Демонстрація / захист
+
+Головний файл: **`lab5.ipynb`** — код запуску частин 2–4 (`LIVE` / `LIVE_PART3` / `LIVE_PART4`)
+і всі збережені виводи (виклики tools, текст Qwen, графи, частина 3–4).
+Пересобрати після оновлення `outputs/`: `python scripts/build_notebook.py`.
 
 ## Структура
 
