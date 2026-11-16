@@ -2,7 +2,7 @@
 
 Модель: `qwen2.5:3b`
 
-Цей файл згенеровано з `part2_scenarios.json` для зручного читання.
+Послідовність: запит → виклик tool → результат → граф(и) → відповідь.
 
 ## s1_basic_path
 
@@ -12,7 +12,13 @@
 Проклади шлях для потоку від вузла 10.0.0.0 до вузла 10.0.4.4
 ```
 
-### Qwen → tool: install_path
+### Інструменти, які викликав Qwen у цьому сценарії
+
+```
+1. install_path
+```
+
+### Виклик інструмента: install_path
 
 ```
 Аргументи:
@@ -22,7 +28,7 @@
 }
 ```
 
-### Результат install_path [ok]
+### Результат інструмента install_path [ok]
 
 ```
 {
@@ -69,7 +75,43 @@
 }
 ```
 
-### Qwen (відповідь)
+### Граф після кроку 1 встановлення шляху (s1_basic_path)
+
+![Граф після кроку 1 встановлення шляху (s1_basic_path)](figures/part2_s1_basic_path/steps/step_01.png)
+
+### Граф після кроку 2 встановлення шляху (s1_basic_path)
+
+![Граф після кроку 2 встановлення шляху (s1_basic_path)](figures/part2_s1_basic_path/steps/step_02.png)
+
+### Граф після кроку 3 встановлення шляху (s1_basic_path)
+
+![Граф після кроку 3 встановлення шляху (s1_basic_path)](figures/part2_s1_basic_path/steps/step_03.png)
+
+### Граф після кроку 4 встановлення шляху (s1_basic_path)
+
+![Граф після кроку 4 встановлення шляху (s1_basic_path)](figures/part2_s1_basic_path/steps/step_04.png)
+
+### Граф після кроку 5 встановлення шляху (s1_basic_path)
+
+![Граф після кроку 5 встановлення шляху (s1_basic_path)](figures/part2_s1_basic_path/steps/step_05.png)
+
+### Граф після кроку 6 встановлення шляху (s1_basic_path)
+
+![Граф після кроку 6 встановлення шляху (s1_basic_path)](figures/part2_s1_basic_path/steps/step_06.png)
+
+### Граф після кроку 7 встановлення шляху (s1_basic_path)
+
+![Граф після кроку 7 встановлення шляху (s1_basic_path)](figures/part2_s1_basic_path/steps/step_07.png)
+
+### Граф після кроку 8 встановлення шляху (s1_basic_path)
+
+![Граф після кроку 8 встановлення шляху (s1_basic_path)](figures/part2_s1_basic_path/steps/step_08.png)
+
+### Фінальний шлях після install_path (s1_basic_path)
+
+![Фінальний шлях після install_path (s1_basic_path)](figures/part2_s1_basic_path/final_path.png)
+
+### Qwen (текстова відповідь)
 
 ```
 Шлях для потоку від вузла 10.0.0.0 до вузла 10.0.4.4 встановлено.
@@ -96,7 +138,13 @@
 обслуговування. Відправник — 10.0.0.0.
 ```
 
-### Qwen → tool: install_path
+### Інструменти, які викликав Qwen у цьому сценарії
+
+```
+1. install_path
+```
+
+### Виклик інструмента: install_path
 
 ```
 Аргументи:
@@ -110,7 +158,7 @@
 }
 ```
 
-### Результат install_path [ok]
+### Результат інструмента install_path [ok]
 
 ```
 {
@@ -160,7 +208,43 @@
 }
 ```
 
-### Qwen (відповідь)
+### Граф після кроку 1 встановлення шляху (s2_avoid)
+
+![Граф після кроку 1 встановлення шляху (s2_avoid)](figures/part2_s2_avoid/steps/step_01.png)
+
+### Граф після кроку 2 встановлення шляху (s2_avoid)
+
+![Граф після кроку 2 встановлення шляху (s2_avoid)](figures/part2_s2_avoid/steps/step_02.png)
+
+### Граф після кроку 3 встановлення шляху (s2_avoid)
+
+![Граф після кроку 3 встановлення шляху (s2_avoid)](figures/part2_s2_avoid/steps/step_03.png)
+
+### Граф після кроку 4 встановлення шляху (s2_avoid)
+
+![Граф після кроку 4 встановлення шляху (s2_avoid)](figures/part2_s2_avoid/steps/step_04.png)
+
+### Граф після кроку 5 встановлення шляху (s2_avoid)
+
+![Граф після кроку 5 встановлення шляху (s2_avoid)](figures/part2_s2_avoid/steps/step_05.png)
+
+### Граф після кроку 6 встановлення шляху (s2_avoid)
+
+![Граф після кроку 6 встановлення шляху (s2_avoid)](figures/part2_s2_avoid/steps/step_06.png)
+
+### Граф після кроку 7 встановлення шляху (s2_avoid)
+
+![Граф після кроку 7 встановлення шляху (s2_avoid)](figures/part2_s2_avoid/steps/step_07.png)
+
+### Граф після кроку 8 встановлення шляху (s2_avoid)
+
+![Граф після кроку 8 встановлення шляху (s2_avoid)](figures/part2_s2_avoid/steps/step_08.png)
+
+### Фінальний шлях після install_path (s2_avoid)
+
+![Фінальний шлях після install_path (s2_avoid)](figures/part2_s2_avoid/final_path.png)
+
+### Qwen (текстова відповідь)
 
 ```
 Шлях встановлено через наступні вузли та каналі:
@@ -190,14 +274,20 @@
 затримку?
 ```
 
-### Qwen → tool: get_flow_state
+### Інструменти, які викликав Qwen у цьому сценарії
+
+```
+1. get_flow_state
+```
+
+### Виклик інструмента: get_flow_state
 
 ```
 Аргументи:
 {}
 ```
 
-### Результат get_flow_state [ok]
+### Результат інструмента get_flow_state [ok]
 
 ```
 {
@@ -264,7 +354,7 @@
 }
 ```
 
-### Qwen (відповідь)
+### Qwen (текстова відповідь)
 
 ```
 Побудова шляху виконується на вузлі 10.0.4.4. Найменші затримки з цього вузлі до ізносу
@@ -290,14 +380,20 @@
 Скільки триватиме передача останнього потоку і який канал є вузьким місцем?
 ```
 
-### Qwen → tool: get_flow_state
+### Інструменти, які викликав Qwen у цьому сценарії
+
+```
+1. get_flow_state
+```
+
+### Виклик інструмента: get_flow_state
 
 ```
 Аргументи:
 {}
 ```
 
-### Результат get_flow_state [ok]
+### Результат інструмента get_flow_state [ok]
 
 ```
 {
@@ -364,7 +460,7 @@
 }
 ```
 
-### Qwen (відповідь)
+### Qwen (текстова відповідь)
 
 ```
 Останній поток від "10.0.0.0" до "10.0.4.4" проходить через вузли: "10.0.0.0",
@@ -385,7 +481,14 @@
 10.0.4.4.
 ```
 
-### Qwen → tool: simulate_link_failure
+### Інструменти, які викликав Qwen у цьому сценарії
+
+```
+1. simulate_link_failure
+2. install_path
+```
+
+### Виклик інструмента: simulate_link_failure
 
 ```
 Аргументи:
@@ -395,7 +498,7 @@
 }
 ```
 
-### Результат simulate_link_failure [ok]
+### Результат інструмента simulate_link_failure [ok]
 
 ```
 {
@@ -409,7 +512,11 @@
 }
 ```
 
-### Qwen → tool: install_path
+### Стан мережі після simulate_link_failure (s5_failure)
+
+![Стан мережі після simulate_link_failure (s5_failure)](figures/part2_s5_failure/final_path.png)
+
+### Виклик інструмента: install_path
 
 ```
 Аргументи:
@@ -419,7 +526,7 @@
 }
 ```
 
-### Результат install_path [ok]
+### Результат інструмента install_path [ok]
 
 ```
 {
@@ -466,7 +573,43 @@
 }
 ```
 
-### Qwen (відповідь)
+### Граф після кроку 1 встановлення шляху (s5_failure)
+
+![Граф після кроку 1 встановлення шляху (s5_failure)](figures/part2_s5_failure/steps/step_01.png)
+
+### Граф після кроку 2 встановлення шляху (s5_failure)
+
+![Граф після кроку 2 встановлення шляху (s5_failure)](figures/part2_s5_failure/steps/step_02.png)
+
+### Граф після кроку 3 встановлення шляху (s5_failure)
+
+![Граф після кроку 3 встановлення шляху (s5_failure)](figures/part2_s5_failure/steps/step_03.png)
+
+### Граф після кроку 4 встановлення шляху (s5_failure)
+
+![Граф після кроку 4 встановлення шляху (s5_failure)](figures/part2_s5_failure/steps/step_04.png)
+
+### Граф після кроку 5 встановлення шляху (s5_failure)
+
+![Граф після кроку 5 встановлення шляху (s5_failure)](figures/part2_s5_failure/steps/step_05.png)
+
+### Граф після кроку 6 встановлення шляху (s5_failure)
+
+![Граф після кроку 6 встановлення шляху (s5_failure)](figures/part2_s5_failure/steps/step_06.png)
+
+### Граф після кроку 7 встановлення шляху (s5_failure)
+
+![Граф після кроку 7 встановлення шляху (s5_failure)](figures/part2_s5_failure/steps/step_07.png)
+
+### Граф після кроку 8 встановлення шляху (s5_failure)
+
+![Граф після кроку 8 встановлення шляху (s5_failure)](figures/part2_s5_failure/steps/step_08.png)
+
+### Фінальний шлях після install_path (s5_failure)
+
+![Фінальний шлях після install_path (s5_failure)](figures/part2_s5_failure/final_path.png)
+
+### Qwen (текстова відповідь)
 
 ```
 Шлях потоку від 10.0.0.0 до 10.0.4.4 встановлено через вузли та каналів:
