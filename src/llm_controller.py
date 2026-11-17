@@ -39,7 +39,9 @@ class LlmController:
 
     def __init__(self, model, toolbox, system_prompt=SYSTEM_PROMPT,
                  temperature=0.0, num_ctx=8192, max_steps=40,
-                 num_gpu=0, verbose=True, num_predict=384):
+                 num_gpu=0, verbose=True, num_predict=8192):
+        # num_predict великий для частин 2–4: потрібна повнота tool-відповідей,
+        # а не порівняння швидкості (швидкість — лише частина 1 з NUM_PREDICT=128).
         self.model = model
         self.toolbox = toolbox
         self.system_prompt = system_prompt
@@ -233,7 +235,7 @@ class LlmController:
                 "temperature": 0.0,
                 "num_ctx": self.num_ctx,
                 "num_gpu": self.num_gpu,
-                "num_predict": max(768, self.num_predict),
+                "num_predict": self.num_predict,
             },
         )
         elapsed = time.perf_counter() - t0
