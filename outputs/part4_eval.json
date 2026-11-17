@@ -935,5 +935,656 @@
     "Проклади шлях від 10.0.0.0 до 10.0.4.4 в обхід усіх вузлів 10.0.1.0, 10.0.1.1, 10.0.1.2, 10.0.1.3, 10.0.1.4, 10.0.2.0, 10.0.2.1, 10.0.2.2, 10.0.2.3, 10.0.2.4, 10.0.3.0, 10.0.3.1, 10.0.3.2, 10.0.3.3, 10.0.3.4",
     "Встанови правило на схід і одразу скасуй його",
     "Скільки триватиме передача потоку і де вузьке місце?"
-  ]
+  ],
+  "models_en": {
+    "qwen2.5:3b": {
+      "label": "Q4_K_M",
+      "rows": [
+        {
+          "id": "q01_en",
+          "query": "Install a path from 10.0.0.0 to 10.0.4.4",
+          "kind": "valid",
+          "lang": "en",
+          "expected_tools": [
+            "install_path"
+          ],
+          "actual_tools": [
+            "install_path"
+          ],
+          "answer": "The path from 10.0.0.0 to 10.0.4.4 has been installed successfully. The path is as follows: \n10.0.0.0 -> 10.0.0.1 -> 10.0.1.1 -> 10.0.1.2 -> 10.0.1.3 -> 10.0.2.3 -> 10.0.2.4 -> 10.0.3.4 -> 10.0.4.4\n\nThe delay is 31 ms, and the transmission time is 2.500 seconds. The total delay is 2.531 ms. The bottleneck is between 10.0.1.3 and 10.0.2.3. The minimum bandwidth along the path is 400 MBps. The links and their respective delays and bandwidths are as follows:\n- 10.0.0.0-10.0.0.1: 2 ms/800 MBps\n- 10.0.0.1-10.0.1.1: 2 ms/600 MBps\n- 10.0.1.1-10.0.1.2: 5 ms/900 MBps\n- 10.0.1.2-10.0.1.3: 6 ms/700 MBps\n- 10.0.1.3-10.0.2.3: 2 ms/400 MBps\n- 10.0.2.3-10.0.2.4: 4 ms/700 MBps\n- 10.0.2.4-10.0.3.4: 4 ms/900 MBps\n- 10.0.3.4-10.0.4.4: 6 ms/500 MBps\n\nThe optimal path is the same as the installed path. No avoid nodes were used. There are 8 installed rules. The optimal delay is 31 ms. \n\nThe topology has been updated to reflect the new path. Please review the updated topology for any changes.",
+          "correct": true,
+          "error_types": [],
+          "log": [
+            {
+              "step": 1,
+              "tool": "install_path",
+              "arguments": {
+                "src": "10.0.0.0",
+                "dst": "10.0.4.4"
+              },
+              "status": "ok",
+              "result": "{\"path\": [\"10.0.0.0\", \"10.0.0.1\", \"10.0.1.1\", \"10.0.1.2\", \"10.0.1.3\", \"10.0.2.3\", \"10.0.2.4\", \"10.0.3.4\", \"10.0.4.4\"], \"delay_ms\": 31, \"transmission_ms\": 2500.0, \"total_ms\": 2531.0, \"bottleneck\": \"10.0.1.3 — 10.0.2.3\", \"min_bandwidth_MBps\": 400, \"links\": [\"10.0.0.0-10.0.0.1:2ms/800MBps\", \"10.0.0.1-10.0.1.1:2ms/600MBps\", \"10.0.1.1-10.0.1.2:5ms/900MBps\", \"10.0.1.2-10.0.1.3:6ms/700MBps\", \"10.0.1.3-10.0.2.3:2ms/400MBps\", \"10.0.2.3-10.0.2.4:4ms/700MBps\", \"10.0.2.4-10.0.3.4:4ms/900MBps\", \"10.0.3.4-10.0.4.4:6ms/500MBps\"], \"avoid\": [], \"installed_rules\": 8, \"optimal_delay_ms\": 31, \"optimal_path\": [\"10.0.0.0\", \"10.0.0.1\", \"10.0.1.1\", \"10.0.1.2\", \"10.0.1.3\", \"10.0.2.3\", \"10.0.2.4\", \"10.0.3.4\", \"10.0.4.4\"]}",
+              "llm_time_s": 19.354827099999998
+            },
+            {
+              "step": 2,
+              "tool": "(відповідь)",
+              "arguments": {},
+              "status": "answer",
+              "result": "The path from 10.0.0.0 to 10.0.4.4 has been installed successfully. The path is as follows: \n10.0.0.0 -> 10.0.0.1 -> 10.0.1.1 -> 10.0.1.2 -> 10.0.1.3 -> 10.0.2.3 -> 10.0.2.4 -> 10.0.3.4 -> 10.0.4.4\n\nThe delay is 31 ms, and the transmission time is 2.500 seconds. The total delay is 2.531 ms. The bottleneck is between 10.0.1.3 and 10.0.2.3. The minimum bandwidth along the path is 400 MBps. The links and their respective delays and bandwidths are as follows:\n- 10.0.0.0-10.0.0.1: 2 ms/800 MBps\n- 10.0.0.1-10.0.1.1: 2 ms/600 MBps\n- 10.0.1.1-10.0.1.2: 5 ms/900 MBps\n- 10.0.1.2-10.0.1.3: 6 ms/700 MBps\n- 10.0.1.3-10.0.2.3: 2 ms/400 MBps\n- 10.0.2.3-10.0.2.4: 4 ms/700 MBps\n- 10.0.2.4-10.0.3.4: 4 ms/900 MBps\n- 10.0.3.4-10.0.4.4: 6 ms/500 MBps\n\nThe optimal path is the same as the installed path. No avoid nodes were used. There are 8 installed rules. The optimal delay is 31 ms. \n\nThe topology has been updated to reflect the new path. Please review the updated topology for any changes.",
+              "llm_time_s": 52.2476521
+            }
+          ],
+          "steps": 2,
+          "tool_calls": 1,
+          "llm_time_s": 71.6024792,
+          "wall_time_s": 71.6053,
+          "pair_id": "q01"
+        },
+        {
+          "id": "q03_en",
+          "query": "Install a path to node 10.0.9.9",
+          "kind": "impossible_dst",
+          "lang": "en",
+          "expected_tools": [
+            "install_path"
+          ],
+          "actual_tools": [
+            "install_path"
+          ],
+          "answer": "Одразу після запиту на встановлення шляху вузол 10.0.0.1 не був знайдений у базі знань. Я викличу install_path знову з цим вузлом виключено.",
+          "correct": true,
+          "error_types": [],
+          "log": [
+            {
+              "step": 1,
+              "tool": "install_path",
+              "arguments": {
+                "src": "10.0.0.1",
+                "dst": "10.0.9.9",
+                "avoid": []
+              },
+              "status": "error",
+              "result": "{\"error\": \"Вузол поза топологією: 10.0.0.1 або 10.0.9.9\"}",
+              "llm_time_s": 4.263601799999989
+            },
+            {
+              "step": 2,
+              "tool": "(відповідь)",
+              "arguments": {},
+              "status": "answer",
+              "result": "Одразу після запиту на встановлення шляху вузол 10.0.0.1 не був знайдений у базі знань. Я викличу install_path знову з цим вузлом виключено.",
+              "llm_time_s": 6.705342299999998
+            }
+          ],
+          "steps": 2,
+          "tool_calls": 1,
+          "llm_time_s": 10.968944099999987,
+          "wall_time_s": 10.969142599999998,
+          "pair_id": "q03"
+        },
+        {
+          "id": "q04_en",
+          "query": "What is the current flow state?",
+          "kind": "valid_state",
+          "lang": "en",
+          "expected_tools": [
+            "get_flow_state"
+          ],
+          "actual_tools": [
+            "get_flow_state"
+          ],
+          "answer": "The current flow state is as follows:\n- **Source**: 10.0.0.0\n- **Destination**: 10.0.4.4\n- **Path**: Direct path from 10.0.0.0 to 10.0.4.4\n- **Rules**: No rules are currently in place.\n- **Cost to Destination**: 31 hops\n- **Delay**: 0 ms\n- **Transmission Time**: Not specified\n- **Bottleneck**: Not specified\n- **Minimum Bandwidth**: Not specified\n\nThe flow is not yet at the destination, and there is no established path or rules to facilitate the flow. Please proceed with the installation of a rule or a path to establish the flow.",
+          "correct": true,
+          "error_types": [],
+          "log": [
+            {
+              "step": 1,
+              "tool": "get_flow_state",
+              "arguments": {},
+              "status": "ok",
+              "result": "{\"head\": \"10.0.0.0\", \"destination\": \"10.0.4.4\", \"source\": \"10.0.0.0\", \"path\": [\"10.0.0.0\"], \"rules\": [], \"installed_rules\": 0, \"revoked_rules\": 0, \"at_destination\": false, \"cost_to_destination\": 31, \"delay_ms\": 0, \"transmission_ms\": null, \"total_ms\": null, \"bottleneck\": null, \"min_bandwidth_MBps\": null}",
+              "llm_time_s": 1.5910695000000032
+            },
+            {
+              "step": 2,
+              "tool": "(відповідь)",
+              "arguments": {},
+              "status": "answer",
+              "result": "The current flow state is as follows:\n- **Source**: 10.0.0.0\n- **Destination**: 10.0.4.4\n- **Path**: Direct path from 10.0.0.0 to 10.0.4.4\n- **Rules**: No rules are currently in place.\n- **Cost to Destination**: 31 hops\n- **Delay**: 0 ms\n- **Transmission Time**: Not specified\n- **Bottleneck**: Not specified\n- **Minimum Bandwidth**: Not specified\n\nThe flow is not yet at the destination, and there is no established path or rules to facilitate the flow. Please proceed with the installation of a rule or a path to establish the flow.",
+              "llm_time_s": 15.460505099999992
+            }
+          ],
+          "steps": 2,
+          "tool_calls": 1,
+          "llm_time_s": 17.051574599999995,
+          "wall_time_s": 17.051728100000005,
+          "pair_id": "q04"
+        },
+        {
+          "id": "q05_en",
+          "query": "Show telemetry for node 10.0.2.2: delays and bandwidth",
+          "kind": "valid_stats",
+          "lang": "en",
+          "expected_tools": [
+            "get_link_stats"
+          ],
+          "actual_tools": [
+            "get_link_stats"
+          ],
+          "answer": "Telemetry for node 10.0.2.2 shows the following:\n\n- **North (N)**: \n  - Delay: 4 ms\n  - Bandwidth: 600 MB/s\n  - Cost to destination: 22\n  \n- **East (E)**: \n  - Delay: 6 ms\n  - Bandwidth: 800 MB/s\n  - Cost to destination: 14\n  \n- **South (S)**: \n  - Delay: 4 ms\n  - Bandwidth: 200 MB/s\n  - Cost to destination: 24\n  \n- **West (W)**: \n  - Delay: 6 ms\n  - Bandwidth: 200 MB/s\n  - Cost to destination: 26",
+          "correct": true,
+          "error_types": [],
+          "log": [
+            {
+              "step": 1,
+              "tool": "get_link_stats",
+              "arguments": {
+                "node": "10.0.2.2"
+              },
+              "status": "ok",
+              "result": "{\"node\": \"10.0.2.2\", \"cost_to_destination\": 20, \"links\": {\"N\": {\"neighbor\": \"10.0.1.2\", \"delay_ms\": 4, \"bandwidth_MBps\": 600, \"cost_to_destination\": 22}, \"E\": {\"neighbor\": \"10.0.2.3\", \"delay_ms\": 6, \"bandwidth_MBps\": 800, \"cost_to_destination\": 14}, \"S\": {\"neighbor\": \"10.0.3.2\", \"delay_ms\": 4, \"bandwidth_MBps\": 200, \"cost_to_destination\": 24}, \"W\": {\"neighbor\": \"10.0.2.1\", \"delay_ms\": 6, \"bandwidth_MBps\": 200, \"cost_to_destination\": 26}}}",
+              "llm_time_s": 2.6901968999999895
+            },
+            {
+              "step": 2,
+              "tool": "(відповідь)",
+              "arguments": {},
+              "status": "answer",
+              "result": "Telemetry for node 10.0.2.2 shows the following:\n\n- **North (N)**: \n  - Delay: 4 ms\n  - Bandwidth: 600 MB/s\n  - Cost to destination: 22\n  \n- **East (E)**: \n  - Delay: 6 ms\n  - Bandwidth: 800 MB/s\n  - Cost to destination: 14\n  \n- **South (S)**: \n  - Delay: 4 ms\n  - Bandwidth: 200 MB/s\n  - Cost to destination: 24\n  \n- **West (W)**: \n  - Delay: 6 ms\n  - Bandwidth: 200 MB/s\n  - Cost to destination: 26",
+              "llm_time_s": 16.895384800000002
+            }
+          ],
+          "steps": 2,
+          "tool_calls": 1,
+          "llm_time_s": 19.58558169999999,
+          "wall_time_s": 19.585806899999994,
+          "pair_id": "q05"
+        },
+        {
+          "id": "q08_en",
+          "query": "Install some good path as fast as possible",
+          "kind": "ambiguous",
+          "lang": "en",
+          "expected_tools": [
+            "install_path"
+          ],
+          "actual_tools": [
+            "install_path"
+          ],
+          "answer": "The path has been installed successfully. The optimal path from 10.0.1.1 to 10.0.2.2 is through the nodes 10.0.1.1, 10.0.1.2, and 10.0.2.2. The total delay is 1675.67 milliseconds, with the bottleneck at 10.0.1.2 — 10.0.2.2. The minimum bandwidth required for this path is 600 MBps. The installed rules are 2. The optimal delay is 9 milliseconds. Here is the breakdown of the links: \n\n- 10.0.1.1 — 10.0.1.2: 5 milliseconds / 900 MBps\n- 10.0.1.2 — 10.0.2.2: 4 milliseconds / 600 MBps\n\nThe path has been installed, and the network is now configured to use this path for faster transmission. Please let me know if you need any further assistance.",
+          "correct": true,
+          "error_types": [],
+          "log": [
+            {
+              "step": 1,
+              "tool": "install_path",
+              "arguments": {
+                "src": "10.0.1.1",
+                "dst": "10.0.2.2",
+                "avoid": []
+              },
+              "status": "ok",
+              "result": "{\"path\": [\"10.0.1.1\", \"10.0.1.2\", \"10.0.2.2\"], \"delay_ms\": 9, \"transmission_ms\": 1666.67, \"total_ms\": 1675.67, \"bottleneck\": \"10.0.1.2 — 10.0.2.2\", \"min_bandwidth_MBps\": 600, \"links\": [\"10.0.1.1-10.0.1.2:5ms/900MBps\", \"10.0.1.2-10.0.2.2:4ms/600MBps\"], \"avoid\": [], \"installed_rules\": 2, \"optimal_delay_ms\": 9, \"optimal_path\": [\"10.0.1.1\", \"10.0.1.2\", \"10.0.2.2\"]}",
+              "llm_time_s": 3.9537856999999974
+            },
+            {
+              "step": 2,
+              "tool": "(відповідь)",
+              "arguments": {},
+              "status": "answer",
+              "result": "The path has been installed successfully. The optimal path from 10.0.1.1 to 10.0.2.2 is through the nodes 10.0.1.1, 10.0.1.2, and 10.0.2.2. The total delay is 1675.67 milliseconds, with the bottleneck at 10.0.1.2 — 10.0.2.2. The minimum bandwidth required for this path is 600 MBps. The installed rules are 2. The optimal delay is 9 milliseconds. Here is the breakdown of the links: \n\n- 10.0.1.1 — 10.0.1.2: 5 milliseconds / 900 MBps\n- 10.0.1.2 — 10.0.2.2: 4 milliseconds / 600 MBps\n\nThe path has been installed, and the network is now configured to use this path for faster transmission. Please let me know if you need any further assistance.",
+              "llm_time_s": 23.425208899999987
+            }
+          ],
+          "steps": 2,
+          "tool_calls": 1,
+          "llm_time_s": 27.378994599999984,
+          "wall_time_s": 27.380034699999996,
+          "pair_id": "q08"
+        }
+      ],
+      "correct_count": 5,
+      "total": 5,
+      "accuracy": 1.0,
+      "model": "qwen2.5:3b"
+    },
+    "qwen2.5:3b-instruct-q8_0": {
+      "label": "Q8_0",
+      "rows": [
+        {
+          "id": "q01_en",
+          "query": "Install a path from 10.0.0.0 to 10.0.4.4",
+          "kind": "valid",
+          "lang": "en",
+          "expected_tools": [
+            "install_path"
+          ],
+          "actual_tools": [
+            "install_path"
+          ],
+          "answer": "Шлях встановлено. Потік між 10.0.0.0 та 10.0.4.4 проходить через наступні вузли: 10.0.0.0 → 10.0.0.1 → 10.0.1.1 → 10.0.1.2 → 10.0.1.3 → 10.0.2.3 → 10.0.2.4 → 10.0.3.4 → 10.0.4.4. Затримка потоку становить 2531 мілісекунди. Більш низька швидкість пропуску містить канал 10.0.1.3 — 10.0.2.3 з пропускною здатністю 400 МБ/с. Оптимальна швидкість пропуску для цього шляху становить 400 МБ/с.",
+          "correct": true,
+          "error_types": [],
+          "log": [
+            {
+              "step": 1,
+              "tool": "install_path",
+              "arguments": {
+                "dst": "10.0.4.4",
+                "src": "10.0.0.0"
+              },
+              "status": "ok",
+              "result": "{\"path\": [\"10.0.0.0\", \"10.0.0.1\", \"10.0.1.1\", \"10.0.1.2\", \"10.0.1.3\", \"10.0.2.3\", \"10.0.2.4\", \"10.0.3.4\", \"10.0.4.4\"], \"delay_ms\": 31, \"transmission_ms\": 2500.0, \"total_ms\": 2531.0, \"bottleneck\": \"10.0.1.3 — 10.0.2.3\", \"min_bandwidth_MBps\": 400, \"links\": [\"10.0.0.0-10.0.0.1:2ms/800MBps\", \"10.0.0.1-10.0.1.1:2ms/600MBps\", \"10.0.1.1-10.0.1.2:5ms/900MBps\", \"10.0.1.2-10.0.1.3:6ms/700MBps\", \"10.0.1.3-10.0.2.3:2ms/400MBps\", \"10.0.2.3-10.0.2.4:4ms/700MBps\", \"10.0.2.4-10.0.3.4:4ms/900MBps\", \"10.0.3.4-10.0.4.4:6ms/500MBps\"], \"avoid\": [], \"installed_rules\": 8, \"optimal_delay_ms\": 31, \"optimal_path\": [\"10.0.0.0\", \"10.0.0.1\", \"10.0.1.1\", \"10.0.1.2\", \"10.0.1.3\", \"10.0.2.3\", \"10.0.2.4\", \"10.0.3.4\", \"10.0.4.4\"]}",
+              "llm_time_s": 31.94669540000001
+            },
+            {
+              "step": 2,
+              "tool": "(відповідь)",
+              "arguments": {},
+              "status": "answer",
+              "result": "Шлях встановлено. Потік між 10.0.0.0 та 10.0.4.4 проходить через наступні вузли: 10.0.0.0 → 10.0.0.1 → 10.0.1.1 → 10.0.1.2 → 10.0.1.3 → 10.0.2.3 → 10.0.2.4 → 10.0.3.4 → 10.0.4.4. Затримка потоку становить 2531 мілісекунди. Більш низька швидкість пропуску містить канал 10.0.1.3 — 10.0.2.3 з пропускною здатністю 400 МБ/с. Оптимальна швидкість пропуску для цього шляху становить 400 МБ/с.",
+              "llm_time_s": 40.50529499999999
+            }
+          ],
+          "steps": 2,
+          "tool_calls": 1,
+          "llm_time_s": 72.4519904,
+          "wall_time_s": 72.4532796,
+          "pair_id": "q01"
+        },
+        {
+          "id": "q03_en",
+          "query": "Install a path to node 10.0.9.9",
+          "kind": "impossible_dst",
+          "lang": "en",
+          "expected_tools": [
+            "install_path"
+          ],
+          "actual_tools": [
+            "install_path"
+          ],
+          "answer": "Шлях між вузлами 10.0.7.7 та 10.0.9.9 не можливий. Перевірте адреси вузлів.",
+          "correct": true,
+          "error_types": [],
+          "log": [
+            {
+              "step": 1,
+              "tool": "install_path",
+              "arguments": {
+                "src": "10.0.7.7",
+                "dst": "10.0.9.9",
+                "avoid": []
+              },
+              "status": "error",
+              "result": "{\"error\": \"Вузол поза топологією: 10.0.7.7 або 10.0.9.9\"}",
+              "llm_time_s": 5.509511400000008
+            },
+            {
+              "step": 2,
+              "tool": "(відповідь)",
+              "arguments": {},
+              "status": "answer",
+              "result": "Шлях між вузлами 10.0.7.7 та 10.0.9.9 не можливий. Перевірте адреси вузлів.",
+              "llm_time_s": 7.067406000000005
+            }
+          ],
+          "steps": 2,
+          "tool_calls": 1,
+          "llm_time_s": 12.576917400000013,
+          "wall_time_s": 12.57710160000002,
+          "pair_id": "q03"
+        },
+        {
+          "id": "q04_en",
+          "query": "What is the current flow state?",
+          "kind": "valid_state",
+          "lang": "en",
+          "expected_tools": [
+            "get_flow_state"
+          ],
+          "actual_tools": [
+            "get_flow_state"
+          ],
+          "answer": "The current flow state shows that there is no path established from 10.0.0.0 to 10.0.4.4. The controller is not aware of any rules or installed rules for this flow. The cost to destination is 31, and the delay is 0 ms. There is no bottleneck identified, and the minimum bandwidth is not applicable.",
+          "correct": true,
+          "error_types": [],
+          "log": [
+            {
+              "step": 1,
+              "tool": "get_flow_state",
+              "arguments": {},
+              "status": "ok",
+              "result": "{\"head\": \"10.0.0.0\", \"destination\": \"10.0.4.4\", \"source\": \"10.0.0.0\", \"path\": [\"10.0.0.0\"], \"rules\": [], \"installed_rules\": 0, \"revoked_rules\": 0, \"at_destination\": false, \"cost_to_destination\": 31, \"delay_ms\": 0, \"transmission_ms\": null, \"total_ms\": null, \"bottleneck\": null, \"min_bandwidth_MBps\": null}",
+              "llm_time_s": 2.067942600000009
+            },
+            {
+              "step": 2,
+              "tool": "(відповідь)",
+              "arguments": {},
+              "status": "answer",
+              "result": "The current flow state shows that there is no path established from 10.0.0.0 to 10.0.4.4. The controller is not aware of any rules or installed rules for this flow. The cost to destination is 31, and the delay is 0 ms. There is no bottleneck identified, and the minimum bandwidth is not applicable.",
+              "llm_time_s": 11.612399799999992
+            }
+          ],
+          "steps": 2,
+          "tool_calls": 1,
+          "llm_time_s": 13.6803424,
+          "wall_time_s": 13.680509099999995,
+          "pair_id": "q04"
+        },
+        {
+          "id": "q05_en",
+          "query": "Show telemetry for node 10.0.2.2: delays and bandwidth",
+          "kind": "valid_stats",
+          "lang": "en",
+          "expected_tools": [
+            "get_link_stats"
+          ],
+          "actual_tools": [
+            "get_link_stats"
+          ],
+          "answer": "Telemetry for node 10.0.2.2 shows:\n- N: delay 4ms, bandwidth 600MB/s, cost to destination 22\n- E: delay 6ms, bandwidth 800MB/s, cost to destination 14\n- S: delay 4ms, bandwidth 200MB/s, cost to destination 24\n- W: delay 6ms, bandwidth 200MB/s, cost to destination 26",
+          "correct": true,
+          "error_types": [],
+          "log": [
+            {
+              "step": 1,
+              "tool": "get_link_stats",
+              "arguments": {
+                "node": "10.0.2.2"
+              },
+              "status": "ok",
+              "result": "{\"node\": \"10.0.2.2\", \"cost_to_destination\": 20, \"links\": {\"N\": {\"neighbor\": \"10.0.1.2\", \"delay_ms\": 4, \"bandwidth_MBps\": 600, \"cost_to_destination\": 22}, \"E\": {\"neighbor\": \"10.0.2.3\", \"delay_ms\": 6, \"bandwidth_MBps\": 800, \"cost_to_destination\": 14}, \"S\": {\"neighbor\": \"10.0.3.2\", \"delay_ms\": 4, \"bandwidth_MBps\": 200, \"cost_to_destination\": 24}, \"W\": {\"neighbor\": \"10.0.2.1\", \"delay_ms\": 6, \"bandwidth_MBps\": 200, \"cost_to_destination\": 26}}}",
+              "llm_time_s": 3.45122360000002
+            },
+            {
+              "step": 2,
+              "tool": "(відповідь)",
+              "arguments": {},
+              "status": "answer",
+              "result": "Telemetry for node 10.0.2.2 shows:\n- N: delay 4ms, bandwidth 600MB/s, cost to destination 22\n- E: delay 6ms, bandwidth 800MB/s, cost to destination 14\n- S: delay 4ms, bandwidth 200MB/s, cost to destination 24\n- W: delay 6ms, bandwidth 200MB/s, cost to destination 26",
+              "llm_time_s": 16.789710299999996
+            }
+          ],
+          "steps": 2,
+          "tool_calls": 1,
+          "llm_time_s": 20.240933900000016,
+          "wall_time_s": 20.2411477,
+          "pair_id": "q05"
+        },
+        {
+          "id": "q08_en",
+          "query": "Install some good path as fast as possible",
+          "kind": "ambiguous",
+          "lang": "en",
+          "expected_tools": [
+            "install_path"
+          ],
+          "actual_tools": [
+            "get_topology",
+            "install_path"
+          ],
+          "answer": "Шлях від \"10.0.0.0\" до \"10.0.4.4\" встановлено. Затримка: 2531 мс, швидкість передачі: 2500 мс. Найкращий шлях: \"10.0.0.0\" — \"10.0.0.1\" — \"10.0.1.1\" — \"10.0.1.2\" — \"10.0.1.3\" — \"10.0.2.3\" — \"10.0.2.4\" — \"10.0.3.4\" — \"10.0.4.4\". Найкраща затримка: \"10.0.1.3\" — \"10.0.2.3\". Максимальна швидкість каналу: 400 МБ/с.",
+          "correct": true,
+          "error_types": [],
+          "log": [
+            {
+              "step": 1,
+              "tool": "get_topology",
+              "arguments": {},
+              "status": "ok",
+              "result": "{\"num_nodes\": 25, \"num_channels\": 32, \"nodes\": [\"10.0.0.0\", \"10.0.0.1\", \"10.0.0.2\", \"10.0.0.3\", \"10.0.0.4\", \"10.0.1.0\", \"10.0.1.1\", \"10.0.1.2\", \"10.0.1.3\", \"10.0.1.4\", \"10.0.2.0\", \"10.0.2.1\", \"10.0.2.2\", \"10.0.2.3\", \"10.0.2.4\", \"10.0.3.0\", \"10.0.3.1\", \"10.0.3.2\", \"10.0.3.3\", \"10.0.3.4\", \"10.0.4.0\", \"10.0.4.1\", \"10.0.4.2\", \"10.0.4.3\", \"10.0.4.4\"], \"channels\": [\"10.0.0.0-10.0.0.1:2ms/800MBps\", \"10.0.0.1-10.0.0.2:10ms/700MBps\", \"10.0.0.1-10.0.1.1:2ms/600MBps\", \"10.0.0.2-10.0.0.3:10ms/500MBps\", \"10.0.0.3-10.0.0.4:2ms/200MBps\", \"10.0.0.4-10.0.1.4:4ms/600MBps\", \"10.0.1.0-10.0.1.1:2ms/500MBps\", \"10.0.1.0-10.0.2.0:2ms/800MBps\", \"10.0.1.1-10.0.1.2:5ms/900MBps\", \"10.0.1.1-10.0.2.1:6ms/400MBps\", \"10.0.1.2-10.0.1.3:6ms/700MBps\", \"10.0.1.2-10.0.2.2:4ms/600MBps\", \"10.0.1.3-10.0.2.3:2ms/400MBps\", \"10.0.1.4-10.0.2.4:9ms/500MBps\", \"10.0.2.0-10.0.2.1:3ms/900MBps\", \"10.0.2.0-10.0.3.0:7ms/600MBps\", \"10.0.2.1-10.0.2.2:6ms/200MBps\", \"10.0.2.1-10.0.3.1:9ms/500MBps\", \"10.0.2.2-10.0.2.3:6ms/800MBps\", \"10.0.2.2-10.0.3.2:4ms/200MBps\", \"10.0.2.3-10.0.2.4:4ms/700MBps\", \"10.0.2.3-10.0.3.3:5ms/300MBps\", \"10.0.2.4-10.0.3.4:4ms/900MBps\", \"10.0.3.0-10.0.3.1:3ms/600MBps\", \"10.0.3.0-10.0.4.0:7ms/900MBps\", \"10.0.3.1-10.0.4.1:3ms/500MBps\", \"10.0.3.2-10.0.4.2:9ms/600MBps\", \"10.0.3.3-10.0.3.4:10ms/800MBps\", \"10.0.3.3-10.0.4.3:10ms/800MBps\", \"10.0.3.4-10.0.4.4:6ms/500MBps\", \"10.0.4.0-10.0.4.1:3ms/900MBps\", \"10.0.4.2-10.0.4.3:2ms/200MBps\"], \"failed\": []}",
+              "llm_time_s": 2.021259999999984
+            },
+            {
+              "step": 2,
+              "tool": "install_path",
+              "arguments": {
+                "src": "10.0.0.0",
+                "dst": "10.0.4.4",
+                "avoid": []
+              },
+              "status": "ok",
+              "result": "{\"path\": [\"10.0.0.0\", \"10.0.0.1\", \"10.0.1.1\", \"10.0.1.2\", \"10.0.1.3\", \"10.0.2.3\", \"10.0.2.4\", \"10.0.3.4\", \"10.0.4.4\"], \"delay_ms\": 31, \"transmission_ms\": 2500.0, \"total_ms\": 2531.0, \"bottleneck\": \"10.0.1.3 — 10.0.2.3\", \"min_bandwidth_MBps\": 400, \"links\": [\"10.0.0.0-10.0.0.1:2ms/800MBps\", \"10.0.0.1-10.0.1.1:2ms/600MBps\", \"10.0.1.1-10.0.1.2:5ms/900MBps\", \"10.0.1.2-10.0.1.3:6ms/700MBps\", \"10.0.1.3-10.0.2.3:2ms/400MBps\", \"10.0.2.3-10.0.2.4:4ms/700MBps\", \"10.0.2.4-10.0.3.4:4ms/900MBps\", \"10.0.3.4-10.0.4.4:6ms/500MBps\"], \"avoid\": [], \"installed_rules\": 8, \"optimal_delay_ms\": 31, \"optimal_path\": [\"10.0.0.0\", \"10.0.0.1\", \"10.0.1.1\", \"10.0.1.2\", \"10.0.1.3\", \"10.0.2.3\", \"10.0.2.4\", \"10.0.3.4\", \"10.0.4.4\"]}",
+              "llm_time_s": 31.15657239999996
+            },
+            {
+              "step": 3,
+              "tool": "(відповідь)",
+              "arguments": {},
+              "status": "answer",
+              "result": "Шлях від \"10.0.0.0\" до \"10.0.4.4\" встановлено. Затримка: 2531 мс, швидкість передачі: 2500 мс. Найкращий шлях: \"10.0.0.0\" — \"10.0.0.1\" — \"10.0.1.1\" — \"10.0.1.2\" — \"10.0.1.3\" — \"10.0.2.3\" — \"10.0.2.4\" — \"10.0.3.4\" — \"10.0.4.4\". Найкраща затримка: \"10.0.1.3\" — \"10.0.2.3\". Максимальна швидкість каналу: 400 МБ/с.",
+              "llm_time_s": 38.9520938
+            }
+          ],
+          "steps": 3,
+          "tool_calls": 2,
+          "llm_time_s": 72.12992619999994,
+          "wall_time_s": 72.13147140000001,
+          "pair_id": "q08"
+        }
+      ],
+      "correct_count": 5,
+      "total": 5,
+      "accuracy": 1.0,
+      "model": "qwen2.5:3b-instruct-q8_0"
+    }
+  },
+  "queries_en": [
+    "Install a path from 10.0.0.0 to 10.0.4.4",
+    "Install a path to node 10.0.9.9",
+    "What is the current flow state?",
+    "Show telemetry for node 10.0.2.2: delays and bandwidth",
+    "Install some good path as fast as possible"
+  ],
+  "language_compare": {
+    "pairs": [
+      {
+        "pair_id": "q01",
+        "kind": "valid",
+        "uk_query": "Проклади шлях від 10.0.0.0 до 10.0.4.4",
+        "en_query": "Install a path from 10.0.0.0 to 10.0.4.4",
+        "by_model": {
+          "qwen2.5:3b": {
+            "label": "Q4_K_M",
+            "uk_correct": true,
+            "en_correct": true,
+            "uk_tools": [
+              "install_path"
+            ],
+            "en_tools": [
+              "install_path"
+            ],
+            "uk_errors": [],
+            "en_errors": [],
+            "same_outcome": true
+          },
+          "qwen2.5:3b-instruct-q8_0": {
+            "label": "Q8_0",
+            "uk_correct": true,
+            "en_correct": true,
+            "uk_tools": [
+              "install_path"
+            ],
+            "en_tools": [
+              "install_path"
+            ],
+            "uk_errors": [],
+            "en_errors": [],
+            "same_outcome": true
+          }
+        }
+      },
+      {
+        "pair_id": "q03",
+        "kind": "impossible_dst",
+        "uk_query": "Проклади шлях до вузла 10.0.9.9",
+        "en_query": "Install a path to node 10.0.9.9",
+        "by_model": {
+          "qwen2.5:3b": {
+            "label": "Q4_K_M",
+            "uk_correct": true,
+            "en_correct": true,
+            "uk_tools": [
+              "install_path"
+            ],
+            "en_tools": [
+              "install_path"
+            ],
+            "uk_errors": [],
+            "en_errors": [],
+            "same_outcome": true
+          },
+          "qwen2.5:3b-instruct-q8_0": {
+            "label": "Q8_0",
+            "uk_correct": true,
+            "en_correct": true,
+            "uk_tools": [
+              "install_path"
+            ],
+            "en_tools": [
+              "install_path"
+            ],
+            "uk_errors": [],
+            "en_errors": [],
+            "same_outcome": true
+          }
+        }
+      },
+      {
+        "pair_id": "q04",
+        "kind": "valid_state",
+        "uk_query": "Який зараз стан потоку?",
+        "en_query": "What is the current flow state?",
+        "by_model": {
+          "qwen2.5:3b": {
+            "label": "Q4_K_M",
+            "uk_correct": true,
+            "en_correct": true,
+            "uk_tools": [
+              "get_flow_state"
+            ],
+            "en_tools": [
+              "get_flow_state"
+            ],
+            "uk_errors": [],
+            "en_errors": [],
+            "same_outcome": true
+          },
+          "qwen2.5:3b-instruct-q8_0": {
+            "label": "Q8_0",
+            "uk_correct": true,
+            "en_correct": true,
+            "uk_tools": [
+              "get_flow_state"
+            ],
+            "en_tools": [
+              "get_flow_state"
+            ],
+            "uk_errors": [],
+            "en_errors": [],
+            "same_outcome": true
+          }
+        }
+      },
+      {
+        "pair_id": "q05",
+        "kind": "valid_stats",
+        "uk_query": "Покажи телеметрію вузла 10.0.2.2: затримки і пропускну здатність",
+        "en_query": "Show telemetry for node 10.0.2.2: delays and bandwidth",
+        "by_model": {
+          "qwen2.5:3b": {
+            "label": "Q4_K_M",
+            "uk_correct": true,
+            "en_correct": true,
+            "uk_tools": [
+              "get_link_stats"
+            ],
+            "en_tools": [
+              "get_link_stats"
+            ],
+            "uk_errors": [],
+            "en_errors": [],
+            "same_outcome": true
+          },
+          "qwen2.5:3b-instruct-q8_0": {
+            "label": "Q8_0",
+            "uk_correct": true,
+            "en_correct": true,
+            "uk_tools": [
+              "get_link_stats"
+            ],
+            "en_tools": [
+              "get_link_stats"
+            ],
+            "uk_errors": [],
+            "en_errors": [],
+            "same_outcome": true
+          }
+        }
+      },
+      {
+        "pair_id": "q08",
+        "kind": "ambiguous",
+        "uk_query": "Проклади якийсь хороший шлях якомога швидше",
+        "en_query": "Install some good path as fast as possible",
+        "by_model": {
+          "qwen2.5:3b": {
+            "label": "Q4_K_M",
+            "uk_correct": true,
+            "en_correct": true,
+            "uk_tools": [
+              "install_path"
+            ],
+            "en_tools": [
+              "install_path"
+            ],
+            "uk_errors": [],
+            "en_errors": [],
+            "same_outcome": true
+          },
+          "qwen2.5:3b-instruct-q8_0": {
+            "label": "Q8_0",
+            "uk_correct": false,
+            "en_correct": true,
+            "uk_tools": [
+              "get_topology"
+            ],
+            "en_tools": [
+              "get_topology",
+              "install_path"
+            ],
+            "uk_errors": [
+              "wrong_tool"
+            ],
+            "en_errors": [],
+            "same_outcome": false
+          }
+        }
+      }
+    ],
+    "summary": {
+      "qwen2.5:3b": {
+        "label": "Q4_K_M",
+        "pairs": 5,
+        "uk_correct": 5,
+        "en_correct": 5,
+        "same_outcome": 5,
+        "uk_accuracy": 1.0,
+        "en_accuracy": 1.0,
+        "agreement": 1.0
+      },
+      "qwen2.5:3b-instruct-q8_0": {
+        "label": "Q8_0",
+        "pairs": 5,
+        "uk_correct": 4,
+        "en_correct": 5,
+        "same_outcome": 4,
+        "uk_accuracy": 0.8,
+        "en_accuracy": 1.0,
+        "agreement": 0.8
+      }
+    }
+  }
 }

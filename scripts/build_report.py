@@ -341,10 +341,46 @@ def main():
     q8 = part4["models"]["qwen2.5:3b-instruct-q8_0"]
     add_para(
         doc,
-        f"Порівняння: Q4_K_M — {q4['accuracy']*100:.1f}% правильних відповідей; "
-        f"Q8_0 — {q8['accuracy']*100:.1f}%. Помилка Q8_0 на неоднозначному "
-        "запиті q08 (get_topology замість install_path).",
+        f"Порівняння квантувань (UA): Q4_K_M — {q4['accuracy']*100:.1f}% "
+        f"правильних відповідей; Q8_0 — {q8['accuracy']*100:.1f}%.",
     )
+
+    lc = part4.get("language_compare") or {}
+    if lc.get("pairs"):
+        add_heading(doc, "Порівняння української та англійської", 2)
+        add_para(
+            doc,
+            "Додатково (за PDF) порівняно 5 пар однакових намірів українською "
+            "та англійською: q01 (шлях), q03 (неіснуючий вузол), q04 (стан "
+            "потоку), q05 (телеметрія), q08 (неоднозначний запит).",
+        )
+        lang_rows = []
+        for p in lc["pairs"]:
+            for model, m in (p.get("by_model") or {}).items():
+                lang_rows.append([
+                    p["pair_id"],
+                    m["label"],
+                    (p["uk_query"][:36] + "…") if len(p["uk_query"]) > 36
+                    else p["uk_query"],
+                    (p["en_query"][:36] + "…") if len(p["en_query"]) > 36
+                    else p["en_query"],
+                    "так" if m["uk_correct"] else "ні",
+                    "так" if m["en_correct"] else "ні",
+                    "так" if m["same_outcome"] else "ні",
+                ])
+        add_table(
+            doc,
+            ["Пара", "Модель", "UA запит", "EN запит", "UA OK", "EN OK", "Згода"],
+            lang_rows,
+        )
+        for model, s in (lc.get("summary") or {}).items():
+            add_para(
+                doc,
+                f"{s['label']}: UA {s['uk_correct']}/{s['pairs']} "
+                f"({s['uk_accuracy']*100:.1f}%), EN {s['en_correct']}/{s['pairs']} "
+                f"({s['en_accuracy']*100:.1f}%), згода результатів "
+                f"{s['same_outcome']}/{s['pairs']} ({s['agreement']*100:.1f}%).",
+            )
 
     add_heading(doc, "Висновок", 1)
     add_para(

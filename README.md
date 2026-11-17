@@ -9,30 +9,24 @@ NL-інтерфейс SDN-контролера через Ollama tool calling (�
 
 Інференс на цьому ПК — **CPU** (`num_gpu=0`).
 
-## Швидкий запуск
+## Демонстрація / захист
 
+**Єдиний файл: `lab5.ipynb`** — повний код модулів + усі запуски моделей частин 1–4
+і збережені виводи (tools, текст Qwen, графи).
+
+У клітинках: `LIVE_PART1` / `LIVE` / `LIVE_PART3` / `LIVE_PART4`
+(`False` = показати `outputs/`, `True` = знову викликати Ollama).
+
+Опційно (перегенерація артефактів поза ноутбуком):
 ```powershell
 cd c:\Users\Admin\projects\ai_labs\lab5
-python benchmark_part1.py          # частина 1 (якщо треба перезамір)
-python scripts/run_part2.py        # 5 NL-сценаріїв + покрокові PNG
-python scripts/export_part2_chat.py # HTML/Markdown-чат з відповідями Qwen
-python scripts/run_part3.py        # пояснення маршруту
-python scripts/run_part4.py        # ≥10 запитів × Q4 і Q8
-python scripts/generate_steps.py   # перегенерація окремих фото кроків
-python scripts/build_notebook.py   # lab5.ipynb
+python scripts/build_notebook.py   # пересобрати lab5.ipynb з outputs/
 python scripts/build_report.py     # Lab5_report.docx
 ```
 
-Читабельні відповіді частини 2 (без прокрутки JSON вправо):
-- `outputs/part2_chat.html` — відкрити в браузері (бульбашки чату)
+Читабельні відповіді частини 2 (додатково):
+- `outputs/part2_chat.html` — відкрити в браузері
 - `outputs/part2_chat.md` — Markdown
-- `outputs/part2_answers/*.txt` — лише фінальний текст Qwen по сценаріях
-
-## Демонстрація / захист
-
-Головний файл: **`lab5.ipynb`** — код запуску частин 2–4 (`LIVE` / `LIVE_PART3` / `LIVE_PART4`)
-і всі збережені виводи (виклики tools, текст Qwen, графи, частина 3–4).
-Пересобрати після оновлення `outputs/`: `python scripts/build_notebook.py`.
 
 ## Структура
 
