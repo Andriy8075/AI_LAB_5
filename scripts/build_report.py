@@ -192,14 +192,22 @@ def main():
         d = part1[key]
         rows.append([
             label, qn, f"{d['size_gb']:.2f}", f"{d['ram_used_gb']:.2f}",
+            str(d.get("prompt_tokens", "—")), str(d.get("eval_tokens", "—")),
             f"{d['prompt_processing_tok_s']:.2f}", f"{d['generation_tok_s']:.2f}",
         ])
     add_para(doc, "Таблиця 1 – Порівняння варіантів квантування (CPU)", bold=True)
     add_table(
         doc,
         ["Модель", "Квант.", "Розмір, ГБ", "RAM, ГБ",
-         "Обробка, ток/с", "Генерація, ток/с"],
+         "prompt_tok", "eval_tok", "Обробка, ток/с", "Генерація, ток/с"],
         rows,
+    )
+    add_para(
+        doc,
+        "Обробка (prompt eval) — швидкість формування KV-кешу для вхідного "
+        "запиту; генерація (eval) — швидкість видачі токенів відповіді "
+        f"(num_predict={part1[next(iter(part1))].get('eval_tokens', 128)}).",
+        size=12,
     )
 
     # ---- Part 2 tools ----
@@ -239,30 +247,41 @@ def main():
     for sc in part2["scenarios"]:
         add_heading(doc, f"Сценарій {sc['id']}", 2)
         add_para(doc, f"Запит: {sc['query']}", italic=True)
+        tools = [
+            e["tool"] for e in sc.get("log", [])
+            if e.get("tool") and not str(e["tool"]).startswith("(")
+            and e.get("status") != "answer"
+        ]
+        if tools:
+            add_para(
+                doc,
+                "Викликані інструменти: " + ", ".join(dict.fromkeys(tools)),
+                size=12,
+            )
         for e in sc.get("log", []):
-            if str(e["tool"]).startswith("("):
-                add_para(
-                    doc,
-                    f"Крок {e['step']}: відповідь моделі — "
-                    f"{(e.get('result') or '')[:600]}",
-                    size=11,
-                )
-            else:
-                add_para(
-                    doc,
-                    f"Крок {e['step']}: {e['tool']} "
-                    f"{json.dumps(e.get('arguments') or {}, ensure_ascii=False)} "
-                    f"[{e['status']}]",
-                    size=11,
-                )
+            if str(e.get("tool", "")).startswith("(") or e.get("status") == "answer":
+                continue
+            add_para(
+                doc,
+                f"Крок {e['step']}: {e['tool']} "
+                f"{json.dumps(e.get('arguments') or {}, ensure_ascii=False)} "
+                f"[{e['status']}]",
+                size=11,
+            )
+        ans = (sc.get("answer") or "").strip()
+        if ans:
+            add_para(doc, "Відповідь моделі (Qwen):", bold=True, size=12)
+            add_para(doc, ans[:2500] + ("…" if len(ans) > 2500 else ""), size=11)
         pr = sc.get("last_path_result") or {}
         if pr:
             add_para(
                 doc,
-                f"Шлях: {' → '.join(pr.get('path') or [])}; "
+                "Факти контролера: "
+                f"шлях {' → '.join(pr.get('path') or [])}; "
                 f"затримка {pr.get('delay_ms')} мс; "
                 f"час передачі {pr.get('transmission_ms')} мс; "
                 f"вузьке місце {pr.get('bottleneck')}.",
+                size=12,
             )
         # окремі фото кроків (перші кілька + фінал)
         step_dir = os.path.join(ROOT, "figures", f"part2_{sc['id']}", "steps")
@@ -287,17 +306,39 @@ def main():
         doc, os.path.join(ROOT, "figures", "paths.png"),
         caption="Рисунок – Порівняння шляхів: базовий, з обходом, після збою каналу",
     )
+    add_para(doc, "Спостереження за відповідями частини 2:", bold=True, size=12)
+    add_para(
+        doc,
+        "s1: модель коректно переказує шлях, затримку 31 мс, час передачі "
+        "та вузьке місце з результату install_path. s2 (обхід): контролер "
+        "будує інший маршрут (через 10.0.0.2…10.0.1.4), проте текст моделі "
+        "іноді все ще перелічує вузли базового шляху — розбіжність тексту з "
+        "last_path_result. s3/s4: get_flow_state дає факти про голову потоку "
+        "й метрики; формулювання моделі можуть бути неточними щодо одиниць. "
+        "s5: simulate_link_failure + install_path перебудовують шлях після "
+        "збою 10.0.1.1—10.0.1.2; відповідь узгоджується з новим маршрутом "
+        "контролера.",
+        size=12,
+    )
 
     # ---- Part 3 ----
     add_heading(doc, "Частина 3. Пояснення маршруту", 1)
+    add_para(
+        doc,
+        f"Модель: {part3.get('model', 'qwen2.5:3b')}; "
+        f"час генерації ≈{float(part3.get('llm_time_s') or 0):.1f} с; "
+        f"prompt_tokens={part3.get('prompt_tokens')}, "
+        f"eval_tokens={part3.get('eval_tokens')}.",
+        size=12,
+    )
     add_para(doc, "Журнал контролера, переданий моделі:", bold=True)
     add_code(doc, part3["journal"], max_chars=8000)
     add_para(doc, "Пояснення моделі:", bold=True)
     add_para(doc, part3["explanation"], size=12)
     add_para(
         doc,
-        "Неточності в поясненні моделі перевіряються вручну за фактами "
-        "журналу контролера (автоматичний пошук слів у відповіді не "
+        "Неточності в поясненні перевіряються вручну за фактами журналу "
+        "контролера (автоматичний пошук ключових слів у відповіді не "
         "використовується).",
     )
     facts = part3.get("facts") or {}
@@ -309,13 +350,34 @@ def main():
         f"bottleneck={facts.get('bottleneck')}, "
         f"transmission_ms={facts.get('transmission_ms')}.",
     )
+    add_para(doc, "Ручна верифікація пояснення:", bold=True, size=12)
+    add_para(
+        doc,
+        "Коректно: шлях збігається з оптимальним (Дейкстра без avoid); "
+        f"затримка шляху {facts.get('delay_ms')} мс дорівнює оптимальній "
+        f"{facts.get('optimal_delay_ms')} мс; вузьке місце вказано як "
+        f"{facts.get('bottleneck')}.",
+        size=12,
+    )
+    add_para(
+        doc,
+        "Неточності стилю/термінології: модель неодноразово називає "
+        "пропускну здатність вузького місця (400 МБ/с) «затримкою 400 МБ/с», "
+        "змішуючи delay і bandwidth; формулювання повторюються й звучать "
+        "розмито, хоча числові факти з журналу загалом збережені. Це "
+        "підтверджує потребу ручної перевірки тексту LLM навіть коли "
+        "маршрут на контролері правильний.",
+        size=12,
+    )
 
     # ---- Part 4 ----
     add_heading(doc, "Частина 4. Критична оцінка", 1)
     add_para(
         doc,
         "Виконано 11 NL-запитів (коректні, неоднозначні, неможливі) на двох "
-        "квантуваннях Q4_K_M та Q8_0.",
+        "квантуваннях Q4_K_M та Q8_0. Формальна оцінка correctness базується "
+        "на очікуваній послідовності інструментів (і відмові/помилці "
+        "інструмента там, де це доречно), а не на літературній якості тексту.",
     )
     for model, block in part4["models"].items():
         add_para(
@@ -340,23 +402,83 @@ def main():
             ["ID", "Запит", "Очікувані", "Фактичні", "OK?", "Помилка"],
             rows,
         )
+        add_para(
+            doc,
+            f"Фрагменти відповідей моделі {block['label']} (UA):",
+            bold=True,
+            size=12,
+        )
+        for r in block["rows"]:
+            ans = (r.get("answer") or "").strip()
+            if not ans:
+                continue
+            add_para(doc, f"{r['id']}. {r['query']}", italic=True, size=11)
+            add_para(
+                doc,
+                ans[:1200] + ("…" if len(ans) > 1200 else ""),
+                size=10,
+            )
 
     q4 = part4["models"]["qwen2.5:3b"]
     q8 = part4["models"]["qwen2.5:3b-instruct-q8_0"]
     add_para(
         doc,
-        f"Порівняння квантувань (UA): Q4_K_M — {q4['accuracy']*100:.1f}% "
-        f"правильних відповідей; Q8_0 — {q8['accuracy']*100:.1f}%.",
+        f"Порівняння квантувань (UA, formal tool-accuracy): Q4_K_M — "
+        f"{q4['accuracy']*100:.1f}% ({q4['correct_count']}/{q4['total']}); "
+        f"Q8_0 — {q8['accuracy']*100:.1f}% "
+        f"({q8['correct_count']}/{q8['total']}).",
+    )
+
+    add_heading(doc, "Якісний аналіз відповідей (частина 4)", 2)
+    add_para(
+        doc,
+        "Попри 100% formal accuracy в обох квантуваннях, текст відповідей "
+        "не завжди узгоджується з фактами інструментів:",
+        size=12,
+    )
+    add_para(
+        doc,
+        "• q02 (шлях з avoid): Q8_0 коректно переказує обхідний маршрут "
+        "контролера; Q4_K_M викликає install_path правильно, але в тексті "
+        "може знову згадати вузли, яких слід уникати — галюцинація змісту "
+        "при формально правильному tool-call.",
+        size=12,
+    )
+    add_para(
+        doc,
+        "• q08 (неоднозначний «хороший швидкий» шлях): Q4_K_M одразу "
+        "викликає install_path і описує конкретний шлях; Q8_0 іноді "
+        "спочатку викликає лише get_topology і вигадує числа/шлях "
+        "(наприклад, фантазійні вузли чи затримки), тобто formal OK за "
+        "очікуваним класом дій не гарантує достовірного тексту.",
+        size=12,
+    )
+    add_para(
+        doc,
+        "• q10 (неможливе правило East/S на 10.0.0.0): обидві моделі "
+        "отримують tool_error від install_rule і повідомляють про відсутність "
+        "каналу; це очікувана поведінка API, а не «успішне» керування.",
+        size=12,
+    )
+    add_para(
+        doc,
+        "• q05/q11: телеметрія й стан потоку загалом передаються з "
+        "інструментів, але модель інколи плутає delay_ms і transmission_ms "
+        "або формулює «вузьке місце» без чіткої прив’язки до пари вузлів.",
+        size=12,
     )
 
     lc = part4.get("language_compare") or {}
+    models_en = part4.get("models_en") or {}
     if lc.get("pairs"):
         add_heading(doc, "Порівняння української та англійської", 2)
         add_para(
             doc,
             "Додатково (за PDF) порівняно 5 пар однакових намірів українською "
             "та англійською: q01 (шлях), q03 (неіснуючий вузол), q04 (стан "
-            "потоку), q05 (телеметрія), q08 (неоднозначний запит).",
+            "потоку), q05 (телеметрія), q08 (неоднозначний запит). Схеми "
+            "інструментів і повідомлення помилок оформлено англійською, щоб "
+            "EN-запити частіше отримували EN-відповіді.",
         )
         lang_rows = []
         for p in lc["pairs"]:
@@ -386,21 +508,65 @@ def main():
                 f"{s['same_outcome']}/{s['pairs']} ({s['agreement']*100:.1f}%).",
             )
 
+        if models_en:
+            add_para(
+                doc,
+                "Приклади англомовних відповідей (з models_en):",
+                bold=True,
+                size=12,
+            )
+            for model, block in models_en.items():
+                add_para(doc, f"{block.get('label', model)}:", bold=True, size=11)
+                for r in block.get("rows") or []:
+                    ans = (r.get("answer") or "").strip()
+                    if not ans:
+                        continue
+                    add_para(
+                        doc,
+                        f"{r['id']}: "
+                        + ans[:900]
+                        + ("…" if len(ans) > 900 else ""),
+                        size=10,
+                    )
+            add_para(
+                doc,
+                "Спостереження щодо мови: Q4_K_M частіше тримає англійську "
+                "у відповіді на EN-запит (q01_en, q04_en, q05_en, q08_en); "
+                "Q8_0 інколи відповідає українською навіть на англійський "
+                "запит (q01_en, q03_en, q08_en). Formal tool-accuracy при "
+                "цьому залишається високою в обох мовах.",
+                size=12,
+            )
+
     add_heading(doc, "Висновок", 1)
+    fp16 = part1["qwen2.5:3b-instruct-fp16"]
+    q8p = part1["qwen2.5:3b-instruct-q8_0"]
+    q4p = part1["qwen2.5:3b"]
     add_para(
         doc,
-        "У частині 1 показано, що квантування зменшує розмір і RAM та "
-        "прискорює генерацію на CPU. У частині 2 реалізовано intent-based "
-        "NL-інтерфейс: модель викликає інструменти, а шлях встановлює "
-        "детермінований knowledge-based контролер (у т.ч. з avoid і після "
-        "simulate_link_failure).",
+        "У частині 1 показано, що квантування зменшує розмір і RAM "
+        f"(FP16 {fp16['size_gb']:.2f}/{fp16['ram_used_gb']:.2f} ГБ → "
+        f"Q8_0 {q8p['size_gb']:.2f}/{q8p['ram_used_gb']:.2f} → "
+        f"Q4_K_M {q4p['size_gb']:.2f}/{q4p['ram_used_gb']:.2f}) і прискорює "
+        f"генерацію на CPU ({fp16['generation_tok_s']:.2f} → "
+        f"{q8p['generation_tok_s']:.2f} → {q4p['generation_tok_s']:.2f} ток/с).",
     )
     add_para(
         doc,
-        "Частина 3 показує, що текстове пояснення моделі потрібно "
-        "верифікувати вручну за журналом контролера. Частина 4 показала "
-        "високу частку правильних tool-послідовностей, але й чутливість до "
-        "неоднозначних формулювань.",
+        "У частині 2 реалізовано intent-based NL-інтерфейс: модель викликає "
+        "інструменти, а шлях встановлює детермінований knowledge-based "
+        "контролер (у т.ч. з avoid і після simulate_link_failure). Текст "
+        "відповіді LLM іноді розходиться з last_path_result контролера "
+        "(наприклад, у сценарії обходу), тому оператору варто звіряти "
+        "відповідь із журналом інструментів.",
+    )
+    add_para(
+        doc,
+        "Частина 3 підтверджує: навіть при правильному маршруті модель "
+        "може плутати терміни delay/bandwidth у поясненні — потрібна ручна "
+        "верифікація за журналом. Частина 4: formal tool-accuracy 100% для "
+        "Q4_K_M і Q8_0 (UA та EN-пари), але якість тексту й мова відповіді "
+        "залежать від квантування та формулювання запиту.",
     )
     add_para(
         doc,
@@ -412,7 +578,13 @@ def main():
     )
 
     out_path = os.path.join(ROOT, "Lab5_report.docx")
-    doc.save(out_path)
+    try:
+        doc.save(out_path)
+    except PermissionError:
+        alt = os.path.join(ROOT, "Lab5_report_new.docx")
+        doc.save(alt)
+        print("Файл зайнятий (закрийте Word); збережено:", alt)
+        raise SystemExit(2)
     print("Звіт збережено:", out_path)
 
 
