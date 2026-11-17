@@ -6,12 +6,6 @@
   "llm_time_s": 121.28925790000358,
   "prompt_tokens": 1146,
   "eval_tokens": 939,
-  "inaccuracies": [
-    {
-      "type": "wrong_bottleneck_unit",
-      "detail": "Вузьке місце має BW 400 МБ/с, але в тексті цифра як мс"
-    }
-  ],
   "facts": {
     "path": [
       "10.0.0.0",

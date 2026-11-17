@@ -654,7 +654,8 @@ code(
 md(
     "## 5. Частина 3. Пояснення маршруту\n\n"
     "Моделі передається журнал контролера; вона пояснює вибір шляху. "
-    "Потім пояснення перевіряється за фактами (у цій же клітинці)."
+    "Неточності в поясненні перевіряються **вручну** за фактами нижче "
+    "(без автоматичного пошуку слів у відповіді)."
 )
 
 _part3_launch = r'''
@@ -690,64 +691,6 @@ def build_part3_journal(sc, topo):
         )
     return "\n".join(lines)
 
-def verify_part3_explanation(text, path_res, topo):
-    issues = []
-    delay = path_res.get("delay_ms")
-    opt = path_res.get("optimal_delay_ms", topo.get("opt_delay"))
-    path = path_res.get("path") or []
-    opt_path = path_res.get("optimal_path") or topo.get("opt_path") or []
-    if delay is not None and str(delay) not in text:
-        issues.append({
-            "type": "missing_delay",
-            "detail": f"У поясненні не знайдено фактичну затримку шляху {delay} мс",
-        })
-    if opt is not None and delay is not None:
-        lost = delay - opt
-        if lost == 0 and re.search(r"втрат|гірш|більш(у|а) затрим", text, re.I):
-            if not re.search(r"немає втрат|без втрат|збігає|оптимальн", text, re.I):
-                issues.append({
-                    "type": "false_loss",
-                    "detail": (
-                        f"Шлях оптимальний (delay={delay}=opt={opt}), але пояснення "
-                        "говорить про втрати затримки"
-                    ),
-                })
-    mentioned = re.findall(r"10\.0\.\d+\.\d+", text)
-    known = set(path) | set(opt_path) | {topo["source"], topo["destination"]}
-    for link in path_res.get("links") or []:
-        known.add(link["a"]); known.add(link["b"])
-    for addr in mentioned:
-        try:
-            r, c = sdn_env.parse_address(addr)
-        except Exception:
-            issues.append({"type": "invalid_address", "detail": f"Некоректна адреса: {addr}"})
-            continue
-        if not (0 <= r <= 4 and 0 <= c <= 4):
-            issues.append({"type": "out_of_topology", "detail": f"Адреса поза топологією: {addr}"})
-    if re.search(r"затримк\w*\s+\d+\s*МБ", text, re.I) or re.search(
-        r"\d+\s*МБ/с.*затрим", text, re.I
-    ):
-        issues.append({
-            "type": "unit_confusion",
-            "detail": "Пояснення плутає затримку (мс) з пропускною здатністю (МБ/с)",
-        })
-    bn = path_res.get("bottleneck") or ""
-    min_bw = path_res.get("min_bandwidth_MBps")
-    if bn and min_bw is not None and "вузьк" in text.lower() and str(min_bw) in text:
-        if re.search(rf"{min_bw}\s*мс", text):
-            issues.append({
-                "type": "wrong_bottleneck_unit",
-                "detail": f"Вузьке місце має BW {min_bw} МБ/с, але в тексті цифра як мс",
-            })
-    if not text.strip():
-        issues.append({"type": "empty", "detail": "Порожнє пояснення"})
-    elif text.rstrip().endswith((":", "-", "—")) or len(text) < 80:
-        issues.append({
-            "type": "truncated",
-            "detail": "Пояснення виглядає обрізаним або занадто коротким",
-        })
-    return issues
-
 def explain_from_part2(model=QUANTIZED_MODEL):
     part2_data = json.load(open("outputs/part2_scenarios.json", encoding="utf-8"))
     topo = part2_data["topology"]
@@ -761,15 +704,12 @@ def explain_from_part2(model=QUANTIZED_MODEL):
     env = sdn_env.NetworkEnvironment(sdn_env.generate_grid_graph(), SOURCE, DESTINATION)
     agent = LlmController(model, SdnToolbox(env), num_gpu=0, verbose=True)
     expl = agent.explain_route(journal)
-    issues = verify_part3_explanation(
-        expl["explanation"], sc["last_path_result"], topo)
     out = {
         "scenario_id": sc["id"], "journal": journal,
         "explanation": expl["explanation"], "model": model,
         "llm_time_s": expl.get("llm_time_s"),
         "prompt_tokens": expl.get("prompt_tokens"),
         "eval_tokens": expl.get("eval_tokens"),
-        "inaccuracies": issues,
         "facts": {
             "path": sc["last_path_result"].get("path"),
             "delay_ms": sc["last_path_result"].get("delay_ms"),
@@ -781,7 +721,7 @@ def explain_from_part2(model=QUANTIZED_MODEL):
     }
     with open("outputs/part3_explanation.json", "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
-    print("Збережено outputs/part3_explanation.json; неточностей:", len(issues))
+    print("Збережено outputs/part3_explanation.json")
     return out
 
 if LIVE_PART3:
@@ -801,13 +741,9 @@ _p3_out.append("ЖУРНАЛ, ПЕРЕДАНИЙ МОДЕЛІ:\n")
 _p3_out.append(wrap(PART3.get("journal") or ""))
 _p3_out.append("\n\nПОЯСНЕННЯ QWEN:\n")
 _p3_out.append(wrap(PART3.get("explanation") or ""))
-_p3_out.append("\n\nНЕТОЧНОСТІ (перевірка за фактами):\n")
-if PART3.get("inaccuracies"):
-    for i in PART3["inaccuracies"]:
-        _p3_out.append(f"- [{i['type']}] {i['detail']}")
-else:
-    _p3_out.append("- не виявлено")
-_p3_out.append("\n\nФАКТИ:\n")
+_p3_out.append(
+    "\n\nФАКТИ (для ручної перевірки пояснення):\n"
+)
 _p3_out.append(json.dumps(PART3.get("facts") or {}, ensure_ascii=False, indent=2))
 
 code(
@@ -815,10 +751,7 @@ code(
     "print(part3['journal'])\n"
     "print('\\nПОЯСНЕННЯ QWEN:')\n"
     "print(part3['explanation'])\n"
-    "print('\\nНЕТОЧНОСТІ:')\n"
-    "for i in part3.get('inaccuracies') or []:\n"
-    "    print('-', i['type'] + ':', i['detail'])\n"
-    "print('\\nФАКТИ:')\n"
+    "print('\\nФАКТИ (для ручної перевірки пояснення):')\n"
     "print(json.dumps(part3.get('facts') or {}, ensure_ascii=False, indent=2))",
     "\n".join(_p3_out) + "\n",
 )
@@ -1189,7 +1122,7 @@ md(
     "## 7. Висновок\n\n"
     "- **Частина 1:** квантування зменшує розмір/RAM і прискорює генерацію на CPU.\n"
     "- **Частина 2:** LLM — NL-інтерфейс; шлях ставить `install_path` / knowledge-controller.\n"
-    "- **Частина 3:** текстове пояснення треба верифікувати (виявили плутанину мс/МБ/с).\n"
+    "- **Частина 3:** текстове пояснення перевіряється вручну за фактами журналу.\n"
     "- **Частина 4:** Q4_K_M "
     f"**{PART4['models']['qwen2.5:3b']['accuracy']}**, Q8_0 "
     f"**{PART4['models']['qwen2.5:3b-instruct-q8_0']['accuracy']}** на 11 UA-запитах"

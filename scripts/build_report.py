@@ -294,17 +294,20 @@ def main():
     add_code(doc, part3["journal"], max_chars=8000)
     add_para(doc, "Пояснення моделі:", bold=True)
     add_para(doc, part3["explanation"], size=12)
-    add_para(doc, "Виявлені неточності:", bold=True)
-    if part3.get("inaccuracies"):
-        for i in part3["inaccuracies"]:
-            add_para(doc, f"— [{i['type']}] {i['detail']}")
-    else:
-        add_para(doc, "Неточностей не виявлено.")
     add_para(
         doc,
-        "Факти: шлях оптимальний (31 мс = Dijkstra); вузьке місце "
-        f"{part3['facts'].get('bottleneck')} має пропускну здатність "
-        "400 МБ/с (не затримку). Модель помилково назвала BW «затримкою».",
+        "Неточності в поясненні моделі перевіряються вручну за фактами "
+        "журналу контролера (автоматичний пошук слів у відповіді не "
+        "використовується).",
+    )
+    facts = part3.get("facts") or {}
+    add_para(
+        doc,
+        "Факти для перевірки: "
+        f"delay_ms={facts.get('delay_ms')}, "
+        f"optimal_delay_ms={facts.get('optimal_delay_ms')}, "
+        f"bottleneck={facts.get('bottleneck')}, "
+        f"transmission_ms={facts.get('transmission_ms')}.",
     )
 
     # ---- Part 4 ----
@@ -394,9 +397,9 @@ def main():
     )
     add_para(
         doc,
-        "Частина 3 виявила типову галюцинацію/плутанину одиниць у текстовому "
-        "поясненні навіть при коректному журналі. Частина 4 показала високу "
-        "частку правильних tool-послідовностей, але й чутливість до "
+        "Частина 3 показує, що текстове пояснення моделі потрібно "
+        "верифікувати вручну за журналом контролера. Частина 4 показала "
+        "високу частку правильних tool-послідовностей, але й чутливість до "
         "неоднозначних формулювань.",
     )
     add_para(
