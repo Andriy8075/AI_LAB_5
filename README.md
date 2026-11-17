@@ -9,25 +9,6 @@ NL-інтерфейс SDN-контролера через Ollama tool calling (�
 
 Інференс на цьому ПК — **CPU** (`num_gpu=0`).
 
-## Демонстрація / захист
-
-**Єдиний файл: `lab5.ipynb`** — повний код модулів + усі запуски моделей частин 1–4
-і збережені виводи (tools, текст Qwen, графи).
-
-У клітинках: `LIVE_PART1` / `LIVE` / `LIVE_PART3` / `LIVE_PART4`
-(`False` = показати `outputs/`, `True` = знову викликати Ollama).
-
-Опційно (перегенерація артефактів поза ноутбуком):
-```powershell
-cd c:\Users\Admin\projects\ai_labs\lab5
-python scripts/build_notebook.py   # пересобрати lab5.ipynb з outputs/
-python scripts/build_report.py     # Lab5_report.docx
-```
-
-Читабельні відповіді частини 2 (додатково):
-- `outputs/part2_chat.html` — відкрити в браузері
-- `outputs/part2_chat.md` — Markdown
-
 ## Структура
 
 ```
